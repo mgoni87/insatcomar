@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="">
+ <head>
+  <meta charset="utf-8">
+  <meta name="author" content="Edwar Pons">
+  <meta name="copyright" content="AsterVoIP (1998 - 2025)">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta name="robots" content="noindex,nofollow" >
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Last-Modified" content="0">
+  <meta http-equiv="Cache-Control" content="no-cache,mustrevalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+
+  <title>PBX - Admin Snapshot</title>
+  <link rel="stylesheet" href="https://phontel.centraltelefonica.com.ar/pbx/Css/fonts.css?v=1.5">
+  <link href="https://phontel.centraltelefonica.com.ar/pbx/Css/variables.css?v=1.5" rel="stylesheet" type="text/css">
+  <link href="https://phontel.centraltelefonica.com.ar/pbx/Css/themes/default.css?v=1.5" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://phontel.centraltelefonica.com.ar/pbx/Css/materialIcons.css?v=1.5">
+  <link href="https://phontel.centraltelefonica.com.ar/pbx/Css/estilos.css?v=1.5" rel="stylesheet" type="text/css">
+  <link rel="icon" type="image/png" href="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Cabecera/favicon.png">
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/Comunes/cookies.js?v=1.5"></script>
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/GlobalesLCD.js?v=1.5"></script>
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/Ajax/HTTPRequest.js?v=1.5"></script>
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/Comunes/PedirConf.js?v=1.5"></script>
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/Modulos/MonitColasMini.js?v=1.5"></script>
+  <script type="text/javascript" src="https://phontel.centraltelefonica.com.ar/pbx/Js/Ajax/MostrarDatosLCD.js?v=1.5"></script>
+  <script type="text/javascript">
+   window.onload = function() {
+    uCT = 'lcd';
+    httpCon[0] = new ConseguirXMLHTTPRequest;
+
+    TraerDatos(
+     "/pbx/Phps/HTTPCon/MonitColasMini/calltr-mini.php", "uCT=lcd", "POST", "calltr-mini", 0
+    );
+
+    // Remove interval-based refresh
+    // var funcion0 = "traerDatosQuery(\"0\", 'lcd')";
+    // Intervalo[0] = setInterval(funcion0, 3000);
+    // Esto es para que no vuelva a repetir, con F5 el envío del FORM.
+    if (window.history.replaceState) { // verificamos disponibilidad
+     window.history.replaceState(null, null, window.location.href);
+    }
+
+    var eAbajo = document.getElementById("ErrorAbajo");
+
+    if (eAbajo !== null && !(eAbajo.getAttribute("class")).match(/NoVisible/)) tOutError = setTimeout(CerrarError, 3500);
+   }
+  </script>
+ </head>
+
+ <!--body-->
+ <body>
+
+   <section id="idCuerpo">
+    <div id="usuarioConectado" class="NoVisible">lcd</div>
+    <div id="ErrorAbajo" class="NoVisible">
+     <div id="infoVisual" class="BienAdmin">
+      <img src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Notificaciones/infoVisualBien.png" width="40" height="40" alt="" title="">
+     </div>
+     <div class="infoTextual">
+      <div class="TRight CPadR05">
+       <a href="#" title="" onclick="return CerrarError();">
+        <img src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Notificaciones/infoVisualCerrar.png" width="14" height="14" alt="Cerrar">
+       </a>
+      </div>
+      <div id="ErrorAbajoTexto" class="CPadB20">
+      </div>
+     </div>
+    </div>
+                  <div id="MonColF" class="tahoma_11">
+                   <audio id="repro" class="NoVisible" loop>
+                    <source src="https://phontel.centraltelefonica.com.ar/pbx/Phps/Comunes/audios/beep14.mp3" type="audio/mpeg">
+                    <source src="https://phontel.centraltelefonica.com.ar/pbx/Phps/Comunes/audios/beep2.wav" type="audio/wav">
+                   </audio>
+                   <table border="0" cellspacing="0" cellpadding="0" style="position: relative;">
+                    <tbody style="height: 80px;">
+                     <tr>
+                      <td style="padding-left: 5px;">
+                       <a href="#" title="Monitoreo de Colas Mini" onclick="return verFlot();">
+                        <img src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Cuerpo/MonitColas/settings.png" alt="" width="24" height="24">
+                       </a>
+                       <span id="inf">
+                        <img src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Cuerpo/MonitColas/FlechaApuntadora.png" alt="" width="16" height="16">
+                        Seleccione cola(s) para ver información
+                       </span>
+                       <form name="FormMonitColasMini" action="" method="POST">
+                        <div id="configMCM" class="NoVisible ArribaTodo" style="width: 720px;">
+                         <div class="SubTitulo TLeft">
+                          » Configuración del Monitoreo de Colas Mini
+                         </div>
+                         <div class="CPadT20 bordeTabla TLeft BGBlanco" style="border-top: none;">
+                          <table border="0" width="100%" cellpadding="0" cellspacing="0" class="Normal tahoma_11">
+                           <tbody>
+                            <tr>
+                             <td rowspan="3" style="padding-right: 15px;">
+                              <select name="selec_agt" id="id_selec_agt" multiple size="8">
+                               <option value="1000--AtCteTecnica" selected>
+                                1000 | AtCteTecnica                               </option>
+                               <option value="1001--IntvVentas" selected>
+                                1001 | IntvVentas                               </option>
+                               <option value="1002--NLegal" selected>
+                                1002 | NLegal                               </option>
+                               <option value="1003--AtCteAdmin" selected>
+                                1003 | AtCteAdmin                               </option>
+                               <option value="1004--IntvC2Cventas" selected>
+                                1004 | IntvC2Cventas                               </option>
+                               <option value="1005--AtCteComercial" selected>
+                                1005 | AtCteComercial                               </option>
+                               <option value="1006--PredictivoVENTAS" selected>
+                                1006 | PredictivoVENTAS                               </option>
+                               <option value="1007--IntvRetencion" selected>
+                                1007 | IntvRetencion                               </option>
+                               <option value="1008--InsatVentas" selected>
+                                1008 | InsatVentas                               </option>
+                               <option value="1011--queueMORA" selected>
+                                1011 | queueMORA                               </option>
+                               <option value="1012--IntvBajas" selected>
+                                1012 | IntvBajas                               </option>
+                               <option value="1013--Ventas" selected>
+                                1013 | Ventas                               </option>
+                               <option value="1020--C2CVentas" selected>
+                                1020 | C2CVentas                               </option>
+                               <option value="1021--WSPVentas" selected>
+                                1021 | WSPVentas                               </option>
+                               <option value="1022--queuePREVENTA" selected>
+                                1022 | queuePREVENTA                               </option>
+                               <option value="1025--PreVentas" selected>
+                                1025 | PreVentas                               </option>
+                               <option value="1026--PosventaAR" selected>
+                                1026 | PosventaAR                               </option>
+                               <option value="1032--OrbithVentasAR" selected>
+                                1032 | OrbithVentasAR                               </option>
+                               <option value="1035--AtCteInsatArAdmin" selected>
+                                1035 | AtCteInsatArAdmin                               </option>
+                               <option value="1036--ValleNETventas" selected>
+                                1036 | ValleNETventas                               </option>
+                               <option value="9999--Test" selected>
+                                9999 | Test                               </option>
+                              </select>
+                              <input type="hidden" id="id_cant_colas" name="cant_colas" value="21">
+                              <input type="hidden" id="id_userCallTR" name="userCallTR" value="lcd">
+                             </td>
+                             <td style="width: 180px;">Aviso por Tiempo en Cola (seg.)</td>
+                             <td style="width: 60px;">
+                              <input type="text" id="tAA" name="tAA" size="3" class="tahoma_11 TCenter" value="100">
+                             </td>
+                             <td width="160">
+             <label for="sonidoAA" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="sonidoAA" name="sonidoAA" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Reproducir Sonido</span>             </label>
+
+                             </td>
+                             <td colspan="2"> </td>
+                            </tr>
+                            <tr>
+                             <td style="width: 180px;">Aviso por Llamadas Encoladas</td>
+                             <td style="width: 60px;">
+                              <input type="text" id="tLE" name="tLE" size="3" class="tahoma_11 TCenter" value="60">
+                             </td>
+                             <td>
+             <label for="dA" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="dA" name="dA" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Depende de Agentes</span>             </label>
+
+                             </td>
+                             <td colspan="2">
+             <label for="sonidoLE" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="sonidoLE" name="sonidoLE" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Reproducir Sonido</span>             </label>
+
+                             </td>
+                            </tr>
+                            <tr>
+                             <td style="width: 180px;">Aviso por Agente en Pausa (min.)</td>
+                             <td style="width: 60px;">
+                              <input type="text" id="tAP" name="tAP" size="3" class="tahoma_11 TCenter" value="1">
+                             </td>
+                             <td>
+             <label for="sonidoAP" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="sonidoAP" name="sonidoAP" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Reproducir Sonido</span>             </label>
+
+                             </td>
+                             <td colspan="2"> </td>
+                            </tr>
+                            <tr><td colspan="7"> </td></tr>
+                            <tr>
+                             <td class="CPadTB10 BordeSupCCC" colspan="7">Ocultar</td>
+                            </tr>
+                            <tr>
+                             <td class="CPadL10" colspan="2">
+             <label for="LlamCola" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="LlamCola" name="LlamCola" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Llamadas en Cola</span>             </label>
+
+             <label for="ResAt" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="ResAt" name="ResAt" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Resumen de Atendidas y No Atendidas</span>             </label>
+
+                             </td>
+                             <td class="CPadL10" colspan="2">
+             <label for="EstAgts" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box</span>
+              </a><input type="checkbox" id="EstAgts" name="EstAgts" checked onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Estado de los Agentes</span>             </label>
+
+             <label for="DetEst" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box</span>
+              </a><input type="checkbox" id="DetEst" name="DetEst" checked onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Detalle de Estados</span>             </label>
+
+             <label for="DetAgts" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box_outline_blank</span>
+              </a><input type="checkbox" id="DetAgts" name="DetAgts" onclick="toggleINPUT(this);">
+              <span class="textoTRFinal">Detalle de Agentes</span>             </label>
+
+                             </td>
+                             <td class="CPadT10 TRight" colspan="2">
+                              <input type="submit" name="ModCTM" value="Actualizar" class="tahoma_12" onclick="return modifConfig();">
+                             </td>
+                            </tr>
+                           </tbody>
+                          </table>
+                         </div>
+                        </div>
+                       </form>
+                      </td>
+                     </tr>
+                    </tbody>
+                   </table>
+
+                   <div class="wrapper">
+                    <div id="oneDiv" class="one">
+                     <div id="co">
+                      <table border="0" cellpadding="0" cellspacing="0">
+                       <thead>
+                        <tr>
+                         <td colspan="11" class="TLeft BGBlanco t_cm">Llamados en Cola</td>
+                        </tr>
+                        <tr>
+                         <th class="tleft BGBlanco t_cm" rowspan="2" style="width: 20%;">Cola</th>
+                         <th class="tcenter BGBlanco t_cm" colspan="2">Atendidas</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">No Atendidas</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Total</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Nivel %</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Nivel %<br>< 20s</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera Máxima</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera Promedio</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">EN ESPERA</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera Actual</th>
+                        </tr>
+                        <tr>
+                         <th class="tcenter BGBlanco t_cm" width="10%">En Curso</th>
+                         <th class="tcenter BGBlanco t_cm" width="10%">Finalizadas</th>
+                        </tr>
+                       </thead>
+                       <tbody id="co_tb"></tbody>
+                      </table>
+                     </div>
+
+                     <div id="ane">
+                      <table border="0" cellpadding="0" cellspacing="0">
+                       <tbody>
+                        <tr>
+                         <td class="BGBlanco CPadT10 TCenter" width="25%"><h3>Atendidos</h3></td>
+                         <td class="BGBlanco CPadT10 TCenter" width="25%"><h3>Nivel</h3></td>
+                         <td class="BGBlanco CPadT10 TCenter" width="50%"><h3>Mayor Espera</h3></td>
+                        </tr>
+                        <tr>
+                         <td id="ll_at" class="vAlignM CPadTB10" width="25%"></td>
+                         <td id="prom_at" class="vAlignM CPadTB10" width="25%"></td>
+                         <td id="mte" class="vAlignM CPadTB10"></td>
+                        </tr>
+                        <tr>
+                         <td class="BGBlanco CPadT10 TCenter"><h3>No Atendidos</h3></td>
+                         <td class="BGBlanco CPadT10" colspan="2"><h3>Últimas 3 No Atendidos</h3></td>
+                        </tr>
+                        <tr>
+                         <td id="ll_nat" class="vAlignM CPadTB15 TCenter" width="25%"></td>
+                         <td id="dt_nat" class="vAlignM CPadTB15 TRight CPadR05" colspan="2" width="75%"></td>
+                        </tr>
+                       </tbody>
+                      </table>
+                     </div>
+                     <div id="grupal">
+                      <table id="EstAgtsTable" border="0" cellpadding="0" cellspacing="0" style="border-bottom: none;">
+                       <thead></thead>
+                       <tfoot></tfoot>
+                       <tbody>
+                        <tr><td class="TCenter BGBlanco CPadTB10 negrita t_cm BordeInfCCC" colspan="5">Estado de los Agentes</td></tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">TOTAL (#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Logueados</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Deslogueados (#2)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">En Estado</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Libres</td>
+                        </tr>
+                        <tr id="id_ag1" class="negrita">
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20 enestado">0</td>
+                         <td class="TCenter CPadT20 llAt">0</td>
+                        </tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Registrados(#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">No Registrados (#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Sin Interno (#2)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Hablando</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Entrante</td>
+                        </tr>
+                        <tr id="id_ag2" class="negrita">
+                         <td class="TCenter CPadT20 llAt">0</td>
+                         <td class="TCenter CPadT20 llNAt">0</td>
+                         <td class="TCenter CPadT20 llNAt">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                        </tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Saliente</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">En Espera</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Escucha espía</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Entre Internos</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Con una Cola</td>
+                        </tr>
+                        <tr id="id_ag3" class="negrita">
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 enestado">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                        </tr>
+                       </tbody>
+                      </table>
+                      <div id="id_es" class="contDetEst"></div>
+                      <div class="CPadT20"> </div>
+                     </div>
+                    </div>
+                    <div id="opDiv" class="two">
+                     <div id="op">
+                      <div class="CPadB10">
+                       <a href="#" data-quien="Op-Ac" onclick="return mostrarOcultar(this);" class="ocultarEsconderA">Actual</a>
+                       <a href="#" data-quien="Op-Lo" onclick="return mostrarOcultar(this);" class="ocultarEsconderA">Logueado</a>
+                       <a href="#" data-quien="Op-Ha" onclick="return mostrarOcultar(this);" class="ocultarEsconderI">Hablando</a>
+                       <a href="#" data-quien="Op-In" onclick="return mostrarOcultar(this);" class="ocultarEsconderI">Inactivo</a>
+                       <a href="#" data-quien="Op-Pa" onclick="return mostrarOcultar(this);" class="ocultarEsconderI">Pausa</a>
+                       <a href="#" data-quien="Op-NE" onclick="return mostrarOcultar(this);" class="ocultarEsconderI">NETO</a>
+                       <a href="#" data-quien="Op-cL" onclick="return mostrarOcultar(this);" class="ocultarEsconderA">Cant. Llam.</a>
+                      </div>
+                      <div class="CPadB10">
+             <label for="Op-aL" style="max-width: 280px !important;">
+                            <a href="#" onclick="return false;">
+               <span class="material-icons md-21 md-darkness">check_box</span>
+              </a><input type="checkbox" name="Op-aL" checked data-quien="Op-aL" onclick="toggleINPUT(this); verSoloAgentesLogueados(this); ">
+              <span class="textoTRFinal">Mostrar Solo Agentes Logueados, o en Pausa</span>             </label>
+
+                      </div>
+                      <table border="0" cellpadding="0" cellspacing="0" style="width: 100%;">
+                       <thead>
+                        <tr>
+                         <th class="tleft BGBlanco" rowspan="2">
+                          Operadores
+                          <a href="###tope" onclick="return cambiarOrden(this);">
+                           <img id="imgtope" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenASC.png" width="10" height="10" title="Orden Ascendente">
+                          </a>
+                         </th>
+                         <th class="tleft BGBlanco" rowspan="2">Estado</th>
+                         <th class="tcenter BGBlanco" colspan="2" id="cabTiempos">TIEMPOS</th>
+                         <th class="tright BGBlanco" rowspan="2" id="Op-cL">Cant. llam.</th>
+                        </tr>
+                        <tr>
+                         <th class="BGBlanco" id="Op-Ac">
+                          Actual
+                          <a href="###tact" onclick="return cambiarOrden(this);">
+                           <img id="imgtact" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                         <th class="BGBlanco" id="Op-Lo">
+                          Logueado
+                          <a href="###tlog" onclick="return cambiarOrden(this);">
+                           <img id="imgtlog" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                         <th class="BGBlanco" id="Op-Ha"style="display: none;">
+                          Hablando
+                          <a href="###thab" onclick="return cambiarOrden(this);">
+                           <img id="imgthab" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                         <th class="BGBlanco" id="Op-In"style="display: none;">
+                          Inactivo
+                          <a href="###tina" onclick="return cambiarOrden(this);">
+                           <img id="imgtina" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                         <th class="BGBlanco" id="Op-Pa"style="display: none;">
+                          Pausa
+                          <a href="###tpau" onclick="return cambiarOrden(this);">
+                           <img id="imgtpau" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                         <th class="BGBlanco" id="Op-NE"style="display: none;">
+                          NETO
+                          <a href="###tNETO" onclick="return cambiarOrden(this);">
+                           <img id="imgtNETO" style="margin-bottom: 1px;" src="https://phontel.centraltelefonica.com.ar/pbx/Imgs/Comunes/ordenNN.png" width="10" height="10" title="Orden Descendente">
+                          </a>
+                         </th>
+                        </tr>
+                       </thead>
+                       <tbody id="op_tb"></tbody>
+                      </table>
+                     </div>
+                    </div>
+                   </div>
+                  </div>
+   </section>
+
+ </body>
+</html>

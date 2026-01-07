@@ -1,0 +1,38 @@
+2025-09-03 17:44:42 - Activations table created successfully
+2025-09-03 17:44:42 - Signal_data table created successfully
+2025-09-03 17:44:42 - Deleted 0 signal data records older than 15 days
+2025-09-03 17:44:42 - Login successful
+2025-09-03 17:44:43 - Fetched URL: https://portal.orbith.com/admin/admin/index.php?operation=activacionView
+2025-09-03 17:44:43 - Total records: 180, Total pages: 6
+2025-09-03 17:44:43 - Starting scrape of activacionView, total pages: 6
+2025-09-03 17:44:43 - Processing page 1
+2025-09-03 17:44:43 - Found 0 rows on page 1
+2025-09-03 17:44:44 - Processing page 2
+2025-09-03 17:44:44 - Found 0 rows on page 2
+2025-09-03 17:44:44 - Processing page 3
+2025-09-03 17:44:44 - Found 0 rows on page 3
+2025-09-03 17:44:45 - Processing page 4
+2025-09-03 17:44:45 - Found 0 rows on page 4
+2025-09-03 17:44:45 - Processing page 5
+2025-09-03 17:44:45 - Found 0 rows on page 5
+2025-09-03 17:44:45 - Processing page 6
+2025-09-03 17:44:45 - Found 0 rows on page 6
+2025-09-03 17:44:45 - Total records collected from activacionView: 0
+2025-09-03 17:44:47 - Fetched URL: https://portal.orbith.com/admin/admin/index.php?operation=estado_redView
+2025-09-03 17:44:47 - Total records: 180, Total pages: 6
+2025-09-03 17:44:47 - Starting scrape of estado_redView, total pages: 6
+2025-09-03 17:44:48 - Processing estado_redView page 1
+2025-09-03 17:44:48 - Found 30 rows on estado_redView page 1
+2025-09-03 17:44:49 - Processing estado_redView page 2
+2025-09-03 17:44:49 - Found 30 rows on estado_redView page 2
+2025-09-03 17:44:51 - Processing estado_redView page 3
+2025-09-03 17:44:51 - Found 30 rows on estado_redView page 3
+2025-09-03 17:44:52 - Processing estado_redView page 4
+2025-09-03 17:44:52 - Found 30 rows on estado_redView page 4
+2025-09-03 17:44:54 - Processing estado_redView page 5
+2025-09-03 17:44:54 - Found 30 rows on estado_redView page 5
+2025-09-03 17:44:55 - Processing estado_redView page 6
+2025-09-03 17:44:55 - Found 30 rows on estado_redView page 6
+2025-09-03 17:44:55 - Saving 0 records to activations table
+2025-09-03 17:44:55 - Reset all activo flags to 0
+2025-09-03 17:44:55 - Scraping completed successfully, total records: 0

@@ -1,0 +1,225 @@
+:root {
+    --primary-blue: #0095f6;
+    --success-green: #4CAF50;
+    --error-red: #ff3b30;
+    --bg-dark: #1a1a1a;
+}
+
+body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #1a1a1a; overflow: hidden;
+}
+
+.story-container {
+    position: relative; width: 100%; max-width: 480px; height: 100vh;
+    margin: 0 auto; display: flex; flex-direction: column;
+    
+    /* ESTRUCTURA CORREGIDA: Padding superior para dar aire al header */
+    justify-content: flex-start; 
+    padding-top: 85px; 
+    
+    align-items: center; text-align: center;
+    box-sizing: border-box; overflow: hidden;
+    background-color: #1a1a1a;
+}
+
+/* FONDO ORIGINAL RECUPERADO */
+.story-container::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    /* Asegúrate de tener este archivo en la misma carpeta */
+    background-image: url('background-gradient-lights_23-2149304973.jpg'); 
+    background-size: cover; background-position: center;
+    filter: blur(15px); z-index: 0; transform: scale(1.1);
+}
+
+/* HEADER */
+.header {
+    position: absolute; top: 35px; left: 20px; display: flex; align-items: center; z-index: 10;
+}
+.header img { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; border: 1px solid rgba(255,255,255,0.3); }
+.header span { font-weight: 600; font-size: 14px; color: white; text-shadow: 0px 1px 2px rgba(0,0,0,0.5); }
+
+/* BARRA DE PROGRESO */
+.progress-bar-container {
+    position: absolute; top: 12px; left: 10px; right: 10px;
+    height: 2px; display: flex; gap: 5px; z-index: 10;
+}
+.progress-segment { height: 100%; background: rgba(255, 255, 255, 0.3); flex: 1; border-radius: 2px; overflow: hidden; }
+/* Modificamos el relleno de la barra para que soporte la animación */
+.progress-fill {
+    width: 0%; /* Empezamos en 0 */
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+}
+
+/* Clase que dispara la animación de carga */
+.progress-fill.loading {
+    animation: fillProgress 5s linear forwards;
+}
+
+/* Clase para cuando ya está completa (para stories pasadas) */
+.progress-fill.active {
+    width: 100%;
+}
+
+@keyframes fillProgress {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* Ocultar botones inicialmente */
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    z-index: 5;
+    opacity: 0; /* Oculto por defecto */
+    pointer-events: none;
+    transition: opacity 0.5s ease-in;
+    flex-shrink: 0; /* EVITA QUE SE APLASTE EN PANTALLAS CHICAS */
+}
+
+.buttons-container.visible {
+    opacity: 1; /* Visible cuando el JS lo decide */
+    pointer-events: auto;
+}
+
+/* Botón Volver - MANTENIDO EXACTAMENTE IGUAL */
+.btn-back {
+    position: absolute;
+    top: 40%;
+    right: 50%; /* Lo ponemos a la derecha del nombre o ajustamos según preferencia */
+    background: rgba(255, 255, 255, 0);
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 20;
+    backdrop-filter: blur(5px);
+}
+
+/* Si prefieres que esté a la izquierda absoluta, antes del logo: */
+.back-container {
+    position: absolute;
+    top: 35px;
+    left: 10px;
+    z-index: 20;
+}
+
+/* TOAST CENTRADO PERFECTO */
+#toast {
+    position: fixed;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); /* Corregido para centrado vertical y horizontal */
+    background: rgba(0, 0, 0, 0.9); 
+    color: white;
+    padding: 12px 20px; 
+    border-radius: 20px; 
+    font-size: 13px; 
+    z-index: 1000;
+    display: none;
+    
+    /* CORRECCIÓN DE ANCHO */
+    width: 70%; 
+    max-width: 400px; 
+    box-sizing: border-box;
+    white-space: normal; 
+    text-align: center;
+    line-height: 1.4;
+    
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+/* VIEWPORT (Contenedor de las Cards) - AJUSTADO PARA SCROLL */
+.viewport { 
+    width: 100%; 
+    display: flex; flex-direction: column; align-items: center; 
+    z-index: 5; padding: 0 20px; box-sizing: border-box;
+    /* Transición suave al cambiar de story */
+    transition: opacity 0.2s ease-in-out; 
+    
+    /* CAMBIOS PARA PANTALLAS CHICAS */
+    overflow-y: auto; /* Permite scroll si el contenido no cabe */
+    flex: 1; /* Toma el espacio disponible */
+    padding-bottom: 30px; /* Margen inferior para que no corten los botones */
+    scrollbar-width: none; /* Oculta scrollbar en Firefox */
+}
+.viewport::-webkit-scrollbar {
+    display: none; /* Oculta scrollbar en Chrome/Safari */
+}
+
+/* CARDS DE DATOS */
+.qa-card {
+    width: 100%; max-width: 320px; background: white; border-radius: 15px;
+    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.25); margin-bottom: 20px;
+    flex-shrink: 0; /* EVITA QUE SE APLASTE */
+}
+.qa-header { background-color: #262626; color: white; padding: 15px; font-weight: bold; font-size: 15px; }
+.qa-body { padding: 10px 20px; text-align: left; }
+
+.info-item { margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
+.info-item:last-child { border-bottom: none; }
+.label { color: #8e8e8e; font-size: 10px; font-weight: 700; text-transform: uppercase; display: block; }
+.value { color: #262626; font-size: 14px; display: block; min-height: 18px; }
+
+/* INPUTS */
+.edit-input { width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 6px; font-size: 14px; box-sizing: border-box; outline: none; }
+.edit-input:focus { border-color: var(--primary-blue); }
+.error-text { color: var(--error-red); font-size: 10px; display: none; margin-top: 3px; font-weight: 600; }
+
+/* MAPA */
+.map-frame {
+    width: 100%; max-width: 320px; height: 160px; background: #eee;
+    border-radius: 15px; overflow: hidden; margin-bottom: 20px;
+    border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    position: relative; z-index: 5;
+    flex-shrink: 0; /* EVITA QUE SE APLASTE */
+}
+
+/* BOTONES */
+button { padding: 15px; margin: 5px 0; font-size: 15px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; }
+.btn-primary { background: white; color: var(--primary-blue); }
+.btn-secondary { background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(5px); }
+.btn-save { background: var(--success-green); color: white; }
+
+/* MEDIA QUERIES PARA OPTIMIZACIÓN VERTICAL */
+@media (max-height: 700px) {
+    .story-container { padding-top: 65px; }
+    .qa-card { margin-bottom: 10px; }
+    .map-frame { height: 130px; }
+    .qa-header { padding: 10px 15px; }
+    .info-item { margin-bottom: 5px; }
+    .viewport img:not(.back-icon) {
+        max-height: 25vh !important; /* Forzamos la reducción del alto */
+        width: auto !important;
+        margin: 0 auto;
+    }
+    .label { font-size: 9px; }
+    .value { font-size: 13px; min-height: 14px; }
+    .viewport p { font-size: 14px; margin: 8px 0; } /* Párrafos informativos */
+    button { padding: 12px; font-size: 13px; } /* Botones levemente más compactos */
+}
+
+@media (min-width: 768px) {
+    body { background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; }
+    .story-container { border-radius: 15px; height: 100vh; max-height: 850px; background-color: var(--bg-dark); }
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-blue); /* Usa el azul de tu marca */
+    flex-shrink: 0;
+}

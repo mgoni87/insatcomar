@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Point Finder</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <video id="camera" autoplay playsinline></video>
+  <div id="overlay">
+    <div id="crosshair"></div>
+    <div id="info">
+      <p id="azimuth">Azimut actual: --°</p>
+      <p id="elevation">Elevación actual: --°</p>
+      <p id="status">Apunta el teléfono...</p>
+      <button id="request-sensors" style="display: none;">Permitir acceso a sensores</button>
+      <button id="calibrate" style="display: none;">Calibrar sensores</button>
+    </div>
+  </div>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>

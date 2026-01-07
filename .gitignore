@@ -1,0 +1,47 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Configuración local
+.env
+.env.local
+php.ini
+
+# Archivos de log
+error_log
+access_log
+*.log
+
+# Caché y temporales
+*.cache
+*.tmp
+.tmp/
+node_modules/
+
+# WordPress (si existe)
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+
+# Base de datos
+*.sql
+*.sql.gz
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Compilados/builds
+dist/
+build/
+
+# Archivos sensibles
+credentials.json
+*.pem
+*.key
+dispatch/senal/login_log.txt

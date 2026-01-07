@@ -1,0 +1,210 @@
+@media(max-width: 1200px) {
+    .banda .boxes article {
+        max-width: 300px;
+    }
+    .banda .boxes article:nth-child(2) p {
+        max-width: 180px;
+    }
+    .planes article {
+        max-width: 300px;
+    }
+    .contacto.container img {
+        max-width: 250px;
+    }
+    .redes .container img {
+        max-width: 250px;
+    }
+    .banda .caracteristicas div article:before {
+        left: 120%;
+    }
+}
+@media(max-width: 991px) {
+    .contenedor-general {
+        height: inherit;
+    }
+    h1 {
+        font-size: 49px
+    }
+    header p {
+        font-size: 20px;
+    }
+    header span h2 {
+        font-size: 25px;
+    }
+    header span h3 {
+        font-size: 50px;
+    }
+    header .container-txt {
+        max-width: 480px;
+    }
+    header .container-txt span {
+        max-width: 350px;
+    }
+    .banda .boxes {
+        flex-direction: column;
+    }
+    .banda .boxes article {
+        max-width: 500px;
+        margin: 0 auto;
+        margin-bottom: 25px;
+    }
+    .banda .boxes article:nth-child(2) p {
+        max-width: inherit
+    }
+    .contenido ul {
+        justify-content: center;
+    }
+    .contenido ul li {
+        width: 3%;
+    }
+    .planes .container div {
+        flex-direction: column;
+    }
+    .planes article {
+        max-width: 500px;
+        margin: 0 auto;
+        margin-bottom: 70px;
+    }
+    .banda .caracteristicas div {
+        flex-wrap: wrap;
+    }
+    .banda .caracteristicas div article {
+        width: 50%;
+        padding-bottom: 25px;
+    }
+    .banda .caracteristicas div article:before {
+        width: 0;
+    }
+    .banda .caracteristicas p {
+        margin: 0 auto;
+    }
+    .contacto.container img {
+        max-width: 200px;
+    }
+    .redes .container img {
+        max-width: 200px;
+    }
+}
+@media(max-width: 768px) {
+    .container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    header {
+        background-position: inherit;
+        background-position-x: 66%;
+    }
+    header img {
+        max-width: 60px;
+    }
+    h1 {
+        font-size: 39px;
+    }
+    h2 {
+        font-size: 30px;
+    }
+    h3 {
+        font-size: 20px;
+    }
+    h4 {
+        font-size: 20px;
+    }
+    p {
+        font-size: 14px;
+    }
+    header .container-txt {
+        max-width: 368px;
+        padding-bottom: 80px;
+    }
+    header span h3 {
+        font-size: 25px;
+    }
+    header span h2 {
+        font-size: 12px;
+    }
+    header .container-txt span {
+        max-width: 185px;
+    }
+    form {
+        flex-direction: column;
+    }
+    form input {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+    ::-webkit-input-placeholder{
+        font-size: 14px;
+    }
+    :-moz-placeholder{ /* Firefox 18- */
+        font-size: 14px;
+    }
+    ::-moz-placeholder{ /* Firefox 19+ */
+        font-size: 14px;
+    }
+    :-ms-input-placeholder{
+        font-size: 14px;
+    }
+    .banda .container.boxes {
+        padding-bottom: 25px;
+    }
+    .contenido {
+        padding-top: 35px;
+        padding-bottom: 25px;
+    }
+    .contenido h1 {
+        padding-bottom: 25px;
+    }
+    .contenido ul li {
+        width: 50%;
+    }
+    .planes {
+        padding-bottom: 25px;
+    }
+    .planes article img {
+        max-width: 200px;
+        bottom: -20px;
+    }
+    .planes article p {
+        font-size: 14px;
+    }
+    .redes {
+        padding-top: 35px;
+        padding-bottom: 25px;
+    }
+    .redes .container img {
+        max-width: 160px;
+    }
+    
+}
+@media(max-width: 676px) {
+    header {
+        background-position-x: 75%;
+    }
+    h1 {
+        font-size: 25px;
+    }
+    h2 {
+        font-size: 19px;
+    }
+    
+    .contacto.container {
+        flex-direction: column;
+    }
+    .contacto.container img {
+        margin-bottom: 25px;
+    }
+    .banda .caracteristicas div article {
+        width: 100%;
+    }
+    .contenido ul li {
+        width: 100%;
+        text-align: center;
+    }
+    .redes .container {
+        flex-direction: column;
+    }
+    .redes .container img {
+        max-width: 200px;
+        margin-bottom: 20px;
+    }
+}

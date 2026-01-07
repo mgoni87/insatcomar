@@ -1,0 +1,93 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+
+header .header {
+  background-color: #fff; /* Cambia el color a blanco */
+  height: 45px; /* Reduce a la mitad la altura del encabezado */
+}
+
+header a img {
+  width: 134px; /* Reduce a la mitad el ancho de la imagen */
+  margin-top: 2px; /* Reduce a la mitad el margen superior */
+}
+
+.login-page {
+  width: 410px; /* Reduce a la mitad el ancho de la página de inicio de sesión */
+  padding: 2% 0 0; /* Reduce a la mitad el relleno */
+  margin: auto;
+}
+
+.login-page .form .login {
+  margin-top: -6px; /* Reduce a la mitad el margen superior */
+  margin-bottom: 3px; /* Reduce a la mitad el margen inferior */
+}
+
+.form {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  max-width: 500px; /* Reduce a la mitad el ancho máximo */
+  margin: 0 auto; /* Elimina el margen inferior */
+  padding: 45px; /* Reduce a la mitad el relleno */
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  height: 80%; /* Ajusta la altura al 100% del viewport height */
+}
+
+.form input {
+  font-family: "Roboto", sans-serif;
+  width: 100%;
+  outline: 0;
+  background: #f2f2f2;
+  border: 0;
+  margin: 0 0 0px; /* Reduce a la mitad el margen inferior */
+  padding: 15px; /* Reduce a la mitad el relleno */
+  box-sizing: border-box; /* Ajuste del modelo de caja */
+  font-size: 18px; /* Reduce a la mitad el tamaño de fuente */
+}
+
+.form button {
+  font-family: "Roboto", sans-serif;
+  text-transform: uppercase;
+  outline: 0;
+  background-color: #9b30f4; /* Cambia el color a violeta */
+  background-image: linear-gradient(45deg,#d8a3ff,#9b30f4); /* Degrade entre lila y violeta */
+  width: 100%;
+  border: 0;
+  padding: 15px; /* Reduce a la mitad el relleno */
+  color: #fff;
+  font-size: 10px; /* Reduce a la mitad el tamaño de fuente */
+  -webkit-transition: all 0.3 ease;
+  transition: all 0.3 ease;
+  cursor: pointer;
+  font-size: 23px;
+}
+
+.form button:hover {
+  color: #000; /* Cambia el color del texto al pasar el mouse sobre el botón */
+}
+
+.form .message {
+  margin: 7.5px 0 0; /* Reduce a la mitad el margen superior */
+  color: #b3b3b3;
+  font-size: 14px; /* Reduce a la mitad el tamaño de fuente */
+}
+
+.form .message a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 250px; /* Reduce a la mitad el ancho máximo */
+  margin: 0 auto;
+}
+
+body {
+  background-color: #9b30f4; /* Cambia el color de fondo a violeta */
+  background-image: linear-gradient(45deg,#d8a3ff,#9b30f4); /* Degrade entre lila y violeta */
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

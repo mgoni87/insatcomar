@@ -1,0 +1,11 @@
+# Access control for /admin (v1.5.2 styled error)
+# Error page (outside /admin to evitar recursion)
+ErrorDocument 403 /errors/403.php
+
+<IfModule mod_authz_core.c>
+  Require all denied
+  # Permitir IPv4 directa o IPv6-mapped
+  Require expr (%{REMOTE_ADDR} == '200.45.95.4') || (%{REMOTE_ADDR} == '::ffff:200.45.95.4')
+  # Permitir por X-Forwarded-For si aplica (proxy/CDN futuros)
+  Require expr req('X-Forwarded-For') =~ /(^|,)\s*200\.45\.95\.4\s*(,|$)/
+</IfModule>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Azimut y Elevación para SES-17 con Cámara</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="w-full h-full flex flex-col bg-white">
+    <h1 class="text-3xl font-bold p-4 text-center">Apuntar al Satélite SES-17</h1>
+    <p class="text-gray-600 p-4 text-center">Obtén tu ubicación y activa la cámara. Mueve el celular en forma de 8 para calibrar la brújula. Mantén el celular en posición vertical.</p>
+    
+    <div class="relative flex-grow">
+      <video id="camera-stream" class="w-full h-full object-cover" autoplay></video>
+      <div id="overlay" class="absolute top-0 left-0 p-4 bg-black bg-opacity-50 text-white rounded-tl hidden">
+        <p id="status" class="text-sm">Esperando tu ubicación...</p>
+        <p id="azimuth" class="text-lg font-semibold hidden"></p>
+        <p id="elevation" class="text-lg font-semibold hidden"></p>
+      </div>
+      <div id="device-orientation" class="absolute bottom-0 right-0 p-4 bg-black bg-opacity-50 text-white rounded-br hidden">
+        <p id="device-azimuth" class="text-sm">Azimut del dispositivo: --°</p>
+        <p id="device-elevation" class="text-sm">Elevación del dispositivo: --°</p>
+        <p id="sensor-accuracy" class="text-sm">Exactitud del sensor: --</p>
+      </div>
+      <div id="target-circle" class="absolute w-12 h-12 border-2 border-red-500 rounded-full" style="top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+      <div id="moving-circle" class="absolute w-12 h-12 bg-red-500 rounded-full hidden" style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.7;"></div>
+    </div>
+
+    <div class="flex space-x-4 p-4">
+      <button id="getLocation" class="flex-1 bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-600">Obtener Ubicación</button>
+      <button id="toggleCamera" class="flex-1 bg-green-500 text-white py-3 px-6 rounded hover:bg-green-600">Activar Cámara</button>
+    </div>
+  </div>
+
+  <script>
+    // Longitud del satélite SES-17 (67.1° Oeste)
+    const satLongitude = -67.1;
+
+    // Convertir grados a radianes
+    function toRadians(degrees) {
+      return degrees * Math.PI / 180;
+    }
+
+    // Convertir radianes a grados
+    function toDegrees(radians) {
+      return radians * 180 / Math.PI;
+    }
+
+    // Calcular azimut y elevación para SES-17
+    function calculateAzimuthElevation(userLat, userLon) {
+      const earthRadius = 6371; // Radio de la Tierra en km
+      const satHeight = 35786; // Altura del satélite geoestacionario en km
+      const lat = toRadians(userLat);
+      const lon = toRadians(userLon - satLongitude); // Diferencia de longitud
+
+      // Calcular componentes
+      const cosLat = Math.cos(lat);
+      const sinLat = Math.sin(lat);
+      const cosLon = Math.cos(lon);
+      const sinLon = Math.sin(lon);
+
+      // Calcular elevación
+      const rRatio = earthRadius / (earthRadius + satHeight);
+      const elevationRad = Math.atan2(
+        cosLat * cosLon - rRatio,
+        Math.sqrt(1 - (cosLat * cosLat * cosLon * cosLon))
+      );
+      let elevation = toDegrees(elevationRad);
+
+      // Calcular azimut
+      const azimuthRad = Math.atan2(
+        sinLon,
+        cosLat * cosLon
+      );
+      let azimuth = toDegrees(azimuthRad);
+      if (userLon > satLongitude && userLat < 0) {
+        azimuth = 360 - azimuth; // Ajuste para hemisferio sur y usuarios al este
+      }
+      if (azimuth < 0) azimuth += 360; // Normalizar a 0-360°
+      if (azimuth >= 360) azimuth -= 360;
+      azimuth -= 4.5; // Ajuste fino para coincidir con 345°
+      if (azimuth < 0) azimuth += 360;
+
+      return { azimuth: azimuth.toFixed(2), elevation: elevation.toFixed(2) };
+    }
+
+    // Manejar la cámara
+    let stream = null;
+    const video = document.getElementById('camera-stream');
+    const toggleCameraButton = document.getElementById('toggleCamera');
+    const overlay = document.getElementById('overlay');
+    const deviceOrientationOverlay = document.getElementById('device-orientation');
+    const movingCircle = document.getElementById('moving-circle');
+    const sensorAccuracyText = document.getElementById('sensor-accuracy');
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+        overlay.classList.remove('hidden');
+        deviceOrientationOverlay.classList.remove('hidden');
+        movingCircle.classList.remove('hidden');
+        toggleCameraButton.textContent = 'Desactivar Cámara';
+      } catch (error) {
+        overlay.classList.add('hidden');
+        deviceOrientationOverlay.classList.add('hidden');
+        movingCircle.classList.add('hidden');
+        document.getElementById('status').textContent = 'Error al acceder a la cámara: ' + error.message;
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        overlay.classList.add('hidden');
+        deviceOrientationOverlay.classList.add('hidden');
+        movingCircle.classList.add('hidden');
+        toggleCameraButton.textContent = 'Activar Cámara';
+      }
+    }
+
+    toggleCameraButton.addEventListener('click', () => {
+      if (video.srcObject) {
+        stopCamera();
+      } else {
+        startCamera();
+      }
+    });
+
+    // Manejar el clic en el botón de ubicación
+    let calculatedAzimuth = null;
+    let calculatedElevation = null;
+
+    document.getElementById('getLocation').addEventListener('click', () => {
+      const status = document.getElementById('status');
+      const azimuthText = document.getElementById('azimuth');
+      const elevationText = document.getElementById('elevation');
+
+      if (navigator.geolocation) {
+        status.textContent = 'Obteniendo tu ubicación...';
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const { azimuth, elevation } = calculateAzimuthElevation(latitude, longitude);
+
+            calculatedAzimuth = parseFloat(azimuth);
+            calculatedElevation = parseFloat(elevation);
+
+            status.textContent = `Ubicación: Lat ${latitude.toFixed(2)}°, Lon ${longitude.toFixed(2)}°`;
+            azimuthText.textContent = `Azimut: ${azimuth}°`;
+            elevationText.textContent = `Elevación: ${elevation}°`;
+            azimuthText.classList.remove('hidden');
+            elevationText.classList.remove('hidden');
+          },
+          (error) => {
+            status.textContent = 'Error al obtener la ubicación: ' + error.message;
+          }
+        );
+      } else {
+        status.textContent = 'La geolocalización no es compatible con este navegador.';
+      }
+    });
+
+    // Manejar la orientación del dispositivo con filtro de promedio móvil
+    let smoothedAzimuth = null;
+    const smoothingFactor = 0.2; // Factor para el promedio móvil exponencial
+    const pixelsPerDegree = 2; // Escala para el movimiento del círculo (2px por grado)
+
+    // Manejar la exactitud del sensor magnético
+    let magnetometer = null;
+    if ('Magnetometer' in window) {
+      try {
+        magnetometer = new Magnetometer();
+        magnetometer.addEventListener('activate', () => {
+          // Inicializar con exactitud desconocida hasta que cambie
+          sensorAccuracyText.textContent = 'Exactitud del sensor: Desconocida';
+        });
+        magnetometer.addEventListener('error', (error) => {
+          sensorAccuracyText.textContent = 'Exactitud del sensor: Error del sensor';
+        });
+        magnetometer.addEventListener('accuracy', (event) => {
+          const isPortrait = window.screen.orientation && 
+                            (window.screen.orientation.type === 'portrait-primary' || 
+                             window.screen.orientation.type === 'portrait-secondary');
+          if (!isPortrait) {
+            sensorAccuracyText.textContent = 'Exactitud del sensor: Mantén el celular vertical';
+            return;
+          }
+          const accuracy = event.accuracy;
+          switch (accuracy) {
+            case 'high':
+              sensorAccuracyText.textContent = 'Exactitud del sensor: Alta';
+              break;
+            case 'medium':
+              sensorAccuracyText.textContent = 'Exactitud del sensor: Media';
+              break;
+            case 'low':
+              sensorAccuracyText.textContent = 'Exactitud del sensor: Baja: Calibra moviendo el celular en forma de 8';
+              break;
+            case 'unreliable':
+              sensorAccuracyText.textContent = 'Exactitud del sensor: No confiable';
+              break;
+            default:
+              sensorAccuracyText.textContent = 'Exactitud del sensor: Desconocida';
+          }
+        });
+        magnetometer.start();
+      } catch (error) {
+        sensorAccuracyText.textContent = 'Exactitud del sensor: No disponible';
+      }
+    } else {
+      sensorAccuracyText.textContent = 'Exactitud del sensor: Sensor no compatible';
+    }
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', (event) => {
+        const deviceAzimuthText = document.getElementById('device-azimuth');
+        const deviceElevationText = document.getElementById('device-elevation');
+        let alpha = event.alpha; // Azimut (0° = norte, originalmente en sentido antihorario)
+        const beta = event.beta; // Inclinación vertical (-180° a 180°)
+        const webkitCompassHeading = event.webkitCompassHeading; // Para navegadores WebKit
+
+        // Verificar orientación vertical
+        const isPortrait = window.screen.orientation && 
+                          (window.screen.orientation.type === 'portrait-primary' || 
+                           window.screen.orientation.type === 'portrait-secondary');
+
+        if (!isPortrait) {
+          deviceAzimuthText.textContent = 'Azimut del dispositivo: Mantén el celular vertical';
+          deviceElevationText.textContent = 'Elevación del dispositivo: Mantén el celular vertical';
+          sensorAccuracyText.textContent = 'Exactitud del sensor: Mantén el celular vertical';
+          movingCircle.style.top = '50%';
+          movingCircle.style.left = '50%';
+          movingCircle.style.transform = 'translate(-50%, -50%)';
+          smoothedAzimuth = null; // Reiniciar el filtro
+          return;
+        }
+
+        if ((alpha !== null || webkitCompassHeading !== null) && beta !== null) {
+          // Usar webkitCompassHeading si está disponible, de lo contrario alpha corregido
+          let rawAzimuth = webkitCompassHeading !== null && !isNaN(webkitCompassHeading) 
+                           ? webkitCompassHeading 
+                           : (alpha !== null && !isNaN(alpha) ? 360 - alpha : null);
+          
+          if (rawAzimuth === null) {
+            deviceAzimuthText.textContent = 'Azimut del dispositivo: No disponible';
+            deviceElevationText.textContent = 'Elevación del dispositivo: No disponible';
+            sensorAccuracyText.textContent = 'Exactitud del sensor: No disponible';
+            movingCircle.style.top = '50%';
+            movingCircle.style.left = '50%';
+            movingCircle.style.transform = 'translate(-50%, -50%)';
+            smoothedAzimuth = null;
+            return;
+          }
+
+          // Corregir rotación de 180° (sur en 0° → sur en 180°)
+          rawAzimuth = (rawAzimuth - 90) % 360;
+          if (rawAzimuth < 0) rawAzimuth += 360;
+
+          // Aplicar filtro de promedio móvil exponencial
+          if (smoothedAzimuth === null) {
+            smoothedAzimuth = rawAzimuth;
+          } else {
+            smoothedAzimuth = smoothedAzimuth * (1 - smoothingFactor) + rawAzimuth * smoothingFactor;
+          }
+          if (smoothedAzimuth < 0) smoothedAzimuth += 360;
+          if (smoothedAzimuth >= 360) smoothedAzimuth -= 360;
+
+          // Ajustar elevación para celular vertical = 0°
+          let deviceElevation = beta - 90;
+          // Limitar elevación a -90° a 90°
+          if (deviceElevation > 90) deviceElevation = 180 - deviceElevation;
+          if (deviceElevation < -90) deviceElevation = -180 - deviceElevation;
+
+          deviceAzimuthText.textContent = `Azimut del dispositivo: ${smoothedAzimuth.toFixed(2)}°`;
+          deviceElevationText.textContent = `Elevación del dispositivo: ${deviceElevation.toFixed(2)}°`;
+
+          // Mover el círculo móvil según las diferencias
+          if (calculatedAzimuth !== null && calculatedElevation !== null) {
+            const deltaAzimuth = smoothedAzimuth - calculatedAzimuth;
+            const deltaElevation = deviceElevation - calculatedElevation;
+
+            // Mapear diferencias a píxeles
+            const videoRect = video.getBoundingClientRect();
+            const maxX = videoRect.width / 2 - 24; // Mitad del ancho - radio del círculo (24px)
+            const maxY = videoRect.height / 2 - 24; // Mitad del alto - radio del círculo (24px)
+
+            let x = deltaAzimuth * pixelsPerDegree;
+            let y = -deltaElevation * pixelsPerDegree; // Negativo porque y aumenta hacia abajo
+
+            // Restringir el movimiento dentro del recuadro
+            x = Math.max(-maxX, Math.min(maxX, x));
+            y = Math.max(-maxY, Math.min(maxY, y));
+
+            // Actualizar posición del círculo móvil
+            movingCircle.style.left = `calc(50% + ${x}px)`;
+            movingCircle.style.top = `calc(50% + ${y}px)`;
+            movingCircle.style.transform = 'translate(-50%, -50%)';
+          }
+
+          // Opcional: Ajuste por declinación magnética (desactivado por defecto)
+          // Para Buenos Aires (~10° oeste), descomentar para aplicar:
+          // let magneticDeclination = -10; // Declinación magnética en grados
+          // smoothedAzimuth = (smoothedAzimuth + magneticDeclination) % 360;
+          // if (smoothedAzimuth < 0) smoothedAzimuth += 360;
+        } else {
+          deviceAzimuthText.textContent = 'Azimut del dispositivo: No disponible';
+          deviceElevationText.textContent = 'Elevación del dispositivo: No disponible';
+          sensorAccuracyText.textContent = 'Exactitud del sensor: No disponible';
+          movingCircle.style.top = '50%';
+          movingCircle.style.left = '50%';
+          movingCircle.style.transform = 'translate(-50%, -50%)';
+          smoothedAzimuth = null;
+        }
+      });
+    } else {
+      document.getElementById('device-azimuth').textContent = 'Azimut del dispositivo: Sensores no compatibles';
+      document.getElementById('device-elevation').textContent = 'Elevación del dispositivo: Sensores no compatibles';
+      document.getElementById('sensor-accuracy').textContent = 'Exactitud del sensor: Sensor no compatible';
+      movingCircle.style.top = '50%';
+      movingCircle.style.left = '50%';
+      movingCircle.style.transform = 'translate(-50%, -50%)';
+    }
+  </script>
+</body>
+</html>

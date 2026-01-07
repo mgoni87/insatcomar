@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Configurador de Módem</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        select { padding: 10px; margin: 10px; font-size: 16px; }
+        #connectionStatus, #satelliteText, #finalStatus { margin: 20px 0; font-size: 18px; }
+        canvas { max-width: 90%; margin: 20px auto; background: #fafafa; border: 1px solid #ddd; display: block; height: 220px; width: 90%; }
+        #pointingSection { display: none; }
+        .chart-title { font-weight: bold; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <h1>Configurador de Módem Satelital</h1>
+    <p>1. Conéctate al WiFi del módem (SSID y contraseña en el manual).<br>
+       2. Presiona "Verificar Conexión" para empezar.</p>
+
+    <button id="checkConnection">Verificar Conexión</button>
+    <div id="connectionStatus"></div>
+
+    <select id="beamSelect" disabled>
+        <option value="">Selecciona un Beam</option>
+        <option value="5">Beam 50 (ID 5)</option>
+        <option value="6">Beam 54 (ID 6)</option>
+    </select>
+    <button id="startConfig" disabled>Iniciar Configuración</button>
+
+    <div id="pointingSection">
+        <h2>Apuntando la Antena</h2>
+        <p>Ajusta la antena para maximizar las señales abajo.</p>
+        <div id="satelliteText"></div>
+
+        <div class="chart-title">Signal Strength (dBm)</div>
+        <canvas id="signalChart" aria-label="Señal dBm" role="img"></canvas>
+
+        <div class="chart-title">Es/N0 (dB)</div>
+        <canvas id="esn0Chart" aria-label="EsN0 dB" role="img"></canvas>
+
+        <button id="stopPointing">Finalizar Apuntamiento</button>
+    </div>
+
+    <div id="finalStatus"></div>
+
+    <!-- main.js contiene el renderer de gráficos en canvas (NO usa chart.min.js) -->
+    <script src="main.js"></script>
+</body>
+</html>

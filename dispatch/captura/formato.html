@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8">
+  <meta name="author" content="Edwar Pons">
+  <meta name="copyright" content="AsterVoIP (1998 - 2025)">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+  <meta name="robots" content="noindex,nofollow" >
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Last-Modified" content="0">
+  <meta http-equiv="Cache-Control" content="no-cache,mustrevalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+
+  <title>PBX - Admin</title>
+  <link rel="stylesheet" href="https://200.45.95.4/pbx/Css/fonts.css?v=1.5">
+  <link href="https://200.45.95.4/pbx/Css/variables.css?v=1.5" rel="stylesheet" type="text/css">
+  <link href="https://200.45.95.4/pbx/Css/themes/default.css?v=1.5" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://200.45.95.4/pbx/Css/materialIcons.css?v=1.5">
+  <link href="https://200.45.95.4/pbx/Css/estilos.css?v=1.5" rel="stylesheet" type="text/css">
+  <link rel="icon" type="image/png" href="https://200.45.95.4/pbx/Imgs/Cabecera/favicon.png">
+  <script type="text/javascript">
+   var Path_IMG = "https://200.45.95.4/pbx/Imgs";
+   PedirCfig = "S";
+   seccionAnterior = "td_Repo";
+  </script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Comunes/cookies.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Comunes/sAll.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Globales.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Comunes/ColExp.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Comunes/Reloj.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Ajax/HTTPRequest.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Comunes/PedirConf.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Modulos/MonitColasMini.js?v=1.5"></script>
+  <script type="text/javascript" src="https://200.45.95.4/pbx/Js/Ajax/MostrarDatos.js?v=1.5"></script>
+  <script type="text/javascript">
+   window.onload = function() {
+    // deleteCookie("acco");
+    // Si no está seteada la cookie "acco", la seteo y por defecto le pongo Raiz.
+    checkCookie("acco", "Raiz");
+    var IDReloj = setInterval("Reloj()", 1000);
+    uCT = 'hcrespo';
+    httpCon[0] = new ConseguirXMLHTTPRequest;
+
+    TraerDatos(
+     "/pbx/Phps/HTTPCon/MonitColasMini/calltr-mini.php", "uCT=hcrespo", "POST", "calltr-mini", 0
+    );
+    var funcion0 = "traerDatosQuery(\"0\", 'hcrespo')";
+    Intervalo[0] = setInterval(funcion0, 3000);
+    // Esto es para que no vuelva a repetir, con F5 el envió del FORM.
+    if (window.history.replaceState) { // verificamos disponibilidad
+     window.history.replaceState(null, null, window.location.href);
+    }
+
+    var eAbajo = document.getElementById("ErrorAbajo");
+
+    if (eAbajo !== null && !(eAbajo.getAttribute("class")).match(/NoVisible/)) tOutError = setTimeout(CerrarError, 3500);
+   }
+  </script>
+ </head>
+
+ <!--body onresize="resizeCuerpo();" onkeydown="teclaESC(event);"-->
+ <body onkeydown="teclaESC(event);">
+   <div class="NoVisible" id="Ayuda">
+    <div id="CuerpoAyuda" class="tahoma_12">
+     <div class="TRight">
+      <a href="#" title="" onclick="return CerrarAyuda(0);">
+       <img src="https://200.45.95.4/pbx/Imgs/Comunes/Eliminar.png" alt="" width="16" height="16">
+      </a>
+     </div>
+     <div id="CuerpoA" class="CPadB20"></div>
+    </div>
+   </div>
+   <div class="NoVisible tahoma_11" id="Confirmar">
+    <div class="CPadB10">Est&aacute; seguro que desea realizar la operaci&oacute;n????</div>
+    <div class="CPadTp20 TRight">
+     <a href="#" title="" onclick="return CerrarAyuda(1);" class="BConf">Cancelar</a>
+     <a href="#" title="" class="BConf">Aceptar</a>
+    </div>
+   </div>
+   <div class="NoVisible tahoma_11" id="CRMInalcanzable">
+    <div class="flexColumn flexCenter flexSpaceEvenly Warning" style="height: 100%">
+    </div>
+   </div>
+   <div class="NoVisible tahoma_11" id="BarraProgreso">
+    <p class="TCenter CPadB10">Procesando.</p>
+    <img src="https://200.45.95.4/pbx/Imgs/Cabecera/favicon.png" alt="" height="32" width="32">
+    <p class="TCenter CPadTp10">Esto puede durar varios minutos.<br>Espere por favor!.</p>
+   </div>
+   <div class="NoVisible" id="InfoRegistro">
+    <div id="CuerpoInfoRegistro" class="tahoma_12">
+     <div class="TRight">
+      <a href="#" title="" onclick="return cerrarInfoRegistro();">
+       <img src="https://200.45.95.4/pbx/Imgs/Comunes/Eliminar.png" alt="" width="16" height="16">
+      </a>
+     </div>
+     <div id="CuerpoB" class="CPadB20"></div>
+    </div>
+   </div>
+
+   <div class="NoVisible tahoma_11 TCenter" id="claveCRM">
+    <div class="CPadB10">Ingrese el c&oacute;digo suministrado</div>
+    <div class="CPadB10"><input type="text" id="txtClaveCRM" name="txtClaveCRM" value="" data-clavecrm=""/></div>
+    <div class="CPadTp20 TCenter">
+     <a href="#" title="" onclick="return cerrarClaveCRM(1);" class="BConf">Cancelar</a>
+     <a href="#" title="" class="BConf" onclick="return comprobarClaveCRM()">Aceptar</a>
+    </div>
+   </div>
+  </div>
+                  <div id="MonColF" class="tahoma_11">
+                    <tbody style="height: 80px;">
+                     <tr>
+                      <td style="padding-left: 5px;">
+                       <form name="FormMonitColasMini" action="" method="POST">
+                        <div id="configMCM" class="NoVisible ArribaTodo" style="width: 720px;">
+                         <div class="SubTitulo TLeft">
+                          &raquo; Configuraci&oacute;n del Monitoreo de Colas Mini
+                         </div>
+                         <div class="CPadT20 bordeTabla TLeft BGBlanco" style="border-top: none;">
+                         </div>
+                        </div>
+                       </form>
+                      </td>
+                      <td style="width: 35px;">
+                       <p class="TRight CPadR05">
+                        <a href="#" onclick="return pantCompleta('MonColF');">
+                         <img id="imgPC" src="https://200.45.95.4/pbx/Imgs/Comunes/PantCompleta.png" width="20" height="20" title="Pantalla Completa">
+                        </a>
+                       </p>
+                      </td>
+                     </tr>
+                    </tbody>
+                   </table>
+
+                   <div class="wrapper">
+                    <div id="oneDiv" class="one">
+                     <div id="co">
+                      <table border="0" cellpadding="0" cellspacing="0">
+                       <thead>
+                        <tr>
+                         <td colspan="11" class="TLeft BGBlanco t_cm">Llamados en Cola</td>
+                        </tr>
+                        <tr>
+                         <th class="tleft BGBlanco t_cm" rowspan="2" style="width: 20%;">Cola</th>
+                         <th class="tcenter BGBlanco t_cm" colspan="2">Atendidas</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">No Atendidas</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Total</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Nivel %</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Nivel %<br>&lt; 20s</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera M&aacute;xima</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera Promedio</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">EN ESPERA</th>
+                         <th class="tcenter BGBlanco t_cm" rowspan="2">Espera Actual</th>
+                        </tr>
+                        <tr>
+                         <th class="tcenter BGBlanco t_cm" width="10%">En Curso</th>
+                         <th class="tcenter BGBlanco t_cm" width="10%">Finalizadas</th>
+                        </tr>
+                       </thead>
+                       <tbody id="queues_tb"></tbody>
+                      </table>
+                     </div>
+
+                     <div id="ane">
+                      <table border="0" cellpadding="0" cellspacing="0">
+                       <tbody>
+                        <tr>
+                         <td class="BGBlanco CPadT10 TCenter" width="25%"><h3>Atendidos</h3></td>
+                         <td class="BGBlanco CPadT10 TCenter" width="25%"><h3>Nivel</h3></td>
+                         <td class="BGBlanco CPadT10 TCenter" width="50%"><h3>Mayor Espera</h3></td>
+                        </tr>
+                        <tr>
+                         <td id="ll_at" class="vAlignM CPadTB10" width="25%"></td>
+                         <td id="prom_at" class="vAlignM CPadTB10" width="25%"></td>
+                         <td id="mte" class="vAlignM CPadTB10"></td>
+                        </tr>
+                        <tr>
+                         <td class="BGBlanco CPadT10 TCenter"><h3>No Atendidos</h3></td>
+                         <td class="BGBlanco CPadT10" colspan="2"><h3>Últimas 3 No Atendidos</h3></td>
+                        </tr>
+                        <tr>
+                         <td id="ll_nat" class="vAlignM CPadTB15 TCenter" width="25%"></td>
+                         <td id="dt_nat" class="vAlignM CPadTB15 TRight CPadR05" colspan="2" width="75%"></td>
+                        </tr>
+                       </tbody>
+                      </table>
+                     </div>
+                     <div id="grupal">
+                      <table id="EstAgtsTable" border="0" cellpadding="0" cellspacing="0" style="border-bottom: none;">
+                       <thead></thead>
+                       <tfoot></tfoot>
+                       <tbody>
+                        <tr><td class="TCenter BGBlanco CPadTB10 negrita t_cm BordeInfCCC" colspan="5">Estado de los Agentes</td></tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">TOTAL (#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Logueados</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Deslogueados (#2)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">En Estado</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Libres</td>
+                        </tr>
+                        <tr id="id_ag1" class="negrita">
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20">0</td>
+                         <td class="TCenter CPadT20 enestado">0</td>
+                         <td class="TCenter CPadT20 llAt">0</td>
+                        </tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Registrados(#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">No Registrados (#1)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Sin Interno (#2)</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Hablando</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Entrante</td>
+                        </tr>
+                        <tr id="id_ag2" class="negrita">
+                         <td class="TCenter CPadT20 llAt">0</td>
+                         <td class="TCenter CPadT20 llNAt">0</td>
+                         <td class="TCenter CPadT20 llNAt">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                        </tr>
+                        <tr>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Saliente</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">En Espera</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Escucha esp&iacute;a</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Entre Internos</td>
+                         <td class="TCenter BGBlanco CPadTB10 negrita t_cm" width="20%">Con una Cola</td>
+                        </tr>
+                        <tr id="id_ag3" class="negrita">
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 enestado">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                         <td class="TCenter CPadT20 hesieva">0</td>
+                        </tr>
+                       </tbody>
+                      </table>
+                      <div id="id_es" class="contDetEst"></div>
+                      <div class="CPadT20">&nbsp;</div>
+                     </div>
+                    </div>
+                   </div>
+                  </div>
+   </section>
+  </div>
+ </body>
+</html>

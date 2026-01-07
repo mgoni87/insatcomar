@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asistente de Apuntamiento</title>
+<style>
+  :root{
+    --bg:#0b0f14;--panel:#101722;--ink:#e8f0fb;--muted:#93a6bb;
+    --ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--brand:#60a5fa;
+    --line:rgba(255,255,255,.12)
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0f14,#0d1521 55%,#0b0f14);color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
+  .wrap{max-width:880px;margin:0 auto;padding:18px}
+  header{display:flex;align-items:center;gap:12px;margin:6px 0 16px}
+  .logo{width:38px;height:38px;border-radius:12px;background:
+    radial-gradient(ellipse at 35% 35%,#7fd1ff,transparent 45%),
+    linear-gradient(135deg,#1d2740,#0f172a)}
+  h1{font-size:22px;margin:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .hd{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .bd{padding:16px}
+  .muted{color:var(--muted)}
+  .big{font-size:16px;line-height:1.45}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
+    padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:600}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+  .btn.primary{background:linear-gradient(180deg,#244466,#1a2d48);border-color:#2c4a6f}
+  .btn.ok{background:linear-gradient(180deg,#1f6c41,#154d2e);border-color:#1d6a3f}
+  .btn.warn{background:linear-gradient(180deg,#6b4d14,#4b360e);border-color:#7a5a1a}
+  .btn.bad{background:linear-gradient(180deg,#6b1a1a,#4b0f0f);border-color:#7a2424}
+  .stack{position:relative}
+  video{display:block;width:100%;border-radius:12px;border:1px solid var(--line);background:#0c131d}
+  canvas{display:block;width:100%}
+  #overlay{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; background:transparent; border:0;
+    border-radius:12px;
+  }
+  .center{text-align:center}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .bar{display:flex;gap:10px;justify-content:space-between;margin-top:14px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:999px;margin-right:6px}
+  .note{padding:10px;border-radius:10px;border:1px dashed var(--line);background:rgba(255,255,255,.04)}
+  .alert{padding:12px;border-radius:12px;border:1px solid rgba(255,0,0,.35);background:rgba(255,0,0,.10)}
+  .okbox{padding:12px;border-radius:12px;border:1px solid rgba(0,255,140,.25);background:rgba(0,255,140,.08)}
+  .meter{height:8px;border-radius:999px;background:#131c29;border:1px solid var(--line);overflow:hidden}
+  .meter>i{display:block;height:100%;background:linear-gradient(90deg,#3bd2a2,#59c3ff)}
+  .stepper{display:flex;gap:6px;align-items:center}
+  .chip{border:1px solid var(--line);background:rgba(255,255,255,.05);padding:6px 10px;border-radius:999px}
+  .big-cta{display:grid;gap:10px}
+  .center .emoji{font-size:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo"></div><h1>Asistente de Apuntamiento</h1></header>
+
+  <!-- PASO 1: BIENVENIDA + PERMISOS -->
+  <section id="step-1" class="card">
+    <div class="hd">
+      <strong>Bienvenida</strong>
+      <div class="stepper">
+        <span class="chip">1/4</span><span class="muted">Permisos</span>
+      </div>
+    </div>
+    <div class="bd">
+      <p class="big">
+        Te vamos a <strong>guiar paso a paso</strong> para verificar si es posible el apuntamiento desde tu ubicación.
+        Para continuar, vamos a solicitar acceso a <strong>sensores</strong>, <strong>ubicación</strong> y <strong>cámara</strong>.
+      </p>
+
+      <div id="permStatus" class="note" style="margin:12px 0">
+        <span class="dot" id="dotSensors" style="background:#888"></span> Sensores: —
+        &nbsp;·&nbsp; <span class="dot" id="dotGPS" style="background:#888"></span> Ubicación: —
+        &nbsp;·&nbsp; <span class="dot" id="dotCam" style="background:#888"></span> Cámara: —
+      </div>
+
+      <div id="compatError" class="alert" hidden>
+        ⚠️ Este dispositivo no ofrece orientación absoluta (brújula). No se puede continuar.
+      </div>
+
+      <div id="horizonError" class="alert" hidden>
+        ⚠️ Desde tu ubicación, el objetivo se encuentra <strong>bajo el horizonte</strong>. No es posible el apuntamiento.
+      </div>
+
+      <div class="big-cta">
+        <button id="askPerms" class="btn primary">Conceder permisos y comenzar</button>
+        <button id="goStep1Next" class="btn" disabled>Continuar</button>
+      </div>
+
+      <p class="muted" style="margin-top:10px">Sugerencia: realizá este proceso al aire libre para mejores resultados.</p>
+    </div>
+  </section>
+
+  <!-- PASO 2: AZIMUT (CELU ACOSTADO) -->
+  <section id="step-2" class="card" hidden>
+    <div class="hd">
+      <strong>Apuntamiento Horizontal</strong>
+      <div class="stepper">
+        <span class="chip">2/4</span><span class="muted">Alineá el azimut</span>
+      </div>
+    </div>
+    <div class="bd">
+      <p class="big">
+        Apoyá el teléfono <strong>acostado</strong> sobre una superficie plana y giralo hasta que la aguja
+        coincida con el azimut objetivo. Luego presioná “Siguiente”.
+      </p>
+
+      <div class="row">
+        <span class="chip">Azimut objetivo: <strong id="tgtAz">—</strong>°</span>
+        <span class="chip">Elevación estimada: <strong id="tgtEl">—</strong>°</span>
+        <span class="chip">Tu heading: <strong id="curHead">—</strong>°</span>
+      </div>
+
+      <div style="margin:12px 0">
+        <div class="meter"><i id="azMeter" style="width:0%"></i></div>
+        <div class="muted" id="azHint">Girá el teléfono hasta estar dentro de ±5°</div>
+      </div>
+
+      <canvas id="compass" width="680" height="680"></canvas>
+
+      <div class="bar">
+        <button id="back-2" class="btn">Volver</button>
+        <button id="next-2" class="btn ok" disabled>Siguiente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 3: AR (CÁMARA) -->
+  <section id="step-3" class="card" hidden>
+    <div class="hd">
+      <strong>Ajuste Final</strong>
+      <div class="stepper">
+        <span class="chip">3/4</span><span class="muted">Elevá hasta centrar el punto</span>
+      </div>
+    </div>
+    <div class="bd">
+      <p class="big">
+        Levantá el teléfono <strong>vertical</strong> y elevá lentamente hasta que el punto quede en el centro de la retícula.
+        Cuando el punto esté centrado, se habilitará <strong>Finalizar</strong>.
+      </p>
+
+      <div class="row" style="margin-bottom:8px">
+        <span class="chip">FOV H: 45°</span>
+        <span class="chip">FOV V: <span id="fovVread">—</span>°</span>
+        <span class="chip">Estado: <span id="arState">—</span></span>
+      </div>
+
+      <div class="stack" style="margin-top:6px">
+        <video id="camera" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+
+      <div class="bar">
+        <button id="back-3" class="btn">Volver</button>
+        <button id="finish" class="btn ok" disabled>Finalizar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 4: AGRADECIMIENTO -->
+  <section id="step-4" class="card" hidden>
+    <div class="hd">
+      <strong>Proceso Completado</strong>
+      <div class="stepper">
+        <span class="chip">4/4</span><span class="muted">Gracias</span>
+      </div>
+    </div>
+    <div class="bd center">
+      <div class="emoji">🎯</div>
+      <h2>¡Listo!</h2>
+      <p class="big">Tu apuntamiento fue verificado con éxito. ¡Gracias por utilizar el asistente!</p>
+      <div class="okbox" style="margin-top:12px">
+        Si necesitás repetir el proceso, podés actualizar la página.
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){ 'use strict';
+/* ========= Utiles ========= */
+const d2r=d=>d*Math.PI/180, r2d=r=>r*180/Math.PI;
+const wrap360=d=>{d=d%360; if(d<0)d+=360; return d;};
+const wrap180=d=>((d+180)%360+360)%360-180;
+const $=id=>document.getElementById(id);
+const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+
+function getScreenAngle(){
+  // iOS suele no exponer screen.orientation; usamos window.orientation si existe
+  if (screen.orientation && typeof screen.orientation.angle === 'number') {
+    return screen.orientation.angle || 0;  // 0, 90, 180, 270
+  }
+  if (typeof window.orientation === 'number') {
+    return window.orientation || 0;        // 0, 90, -90, 180 (normalizamos abajo)
+  }
+  return 0;
+}
+
+/* ========= Estado ========= */
+const state={
+  lat:null, lon:null,
+  heading:NaN, pitch:0, roll:0,
+  hx:null, hy:null, smooth:0.15,
+  gotSensors:false, gotGPS:false, gotCam:false,
+  fovH:45, fovV:null,
+  az:null, el:null,
+  azTol:5, arTolPx:20, arHoldMs:900,
+  arHoldAccum:0, lastFrameTs:0
+};
+
+/* ========= Grabación circular (últimos 15s) ========= */
+let mediaRecorder = null;
+let ringChunks = [];
+const SLICE_MS = 1000;     // 1s por chunk
+const FORCE_MP4_UPLOAD = true; // 🔒 Evita subir WebM. Si no hay MP4, no sube.
+const KEEP_SECONDS = 15;   // mantener 15s
+let REC_MIME = null;
+let reqDataTimer = null; // <-- NUEVO: timer para requestData en iOS
+let recCanvas = null, recCtx = null, recStream = null; // canvas de mezcla para grabar con overlay
+let webmSessionHeader = null; // primer chunk con cabecera EBML de la sesión
+
+
+/* ========= Referencias UI ========= */
+const step1=$('step-1'), step2=$('step-2'), step3=$('step-3'), step4=$('step-4');
+const askPerms=$('askPerms'), goStep1Next=$('goStep1Next');
+const dotSensors=$('dotSensors'), dotGPS=$('dotGPS'), dotCam=$('dotCam');
+const compatError=$('compatError'), horizonError=$('horizonError');
+
+const compass=$('compass'), cctx=compass.getContext('2d');
+const tgtAz=$('tgtAz'), tgtEl=$('tgtEl'), curHead=$('curHead'), azMeter=$('azMeter'), azHint=$('azHint');
+const btnBack2=$('back-2'), btnNext2=$('next-2');
+
+const cam=$('camera'), overlay=$('overlay'), octx=overlay.getContext('2d');
+const fovVread=$('fovVread'), arState=$('arState');
+const btnBack3=$('back-3'), btnFinish=$('finish');
+
+/* ========= Satélite objetivo (oculto al usuario) ========= */
+const SAT_LON_DEG = -67.1;
+
+/* ========= GEO → az/el ========= */
+function azElToGeoSat(latDeg, lonDeg, satLonDeg){
+  const a=6378137.0, e2=6.69437999014e-3, Rgeo=42164e3;
+  const lat=d2r(latDeg), lon=d2r(lonDeg), satLon=d2r(satLonDeg);
+  const N=a/Math.sqrt(1-e2*Math.sin(lat)*Math.sin(lat));
+  const xo=N*Math.cos(lat)*Math.cos(lon), yo=N*Math.cos(lat)*Math.sin(lon), zo=(N*(1-e2))*Math.sin(lat);
+  const xs=Rgeo*Math.cos(satLon), ys=Rgeo*Math.sin(satLon), zs=0;
+  const dx=xs-xo, dy=ys-yo, dz=zs-zo;
+  const sinLat=Math.sin(lat), cosLat=Math.cos(lat), sinLon=Math.sin(lon), cosLon=Math.cos(lon);
+  const E=-sinLon*dx+cosLon*dy;
+  const Nn=-sinLat*cosLon*dx - sinLat*sinLon*dy + cosLat*dz;
+  const U=cosLat*cosLon*dx + cosLat*sinLon*dy + sinLat*dz;
+  const az=wrap360(r2d(Math.atan2(E,Nn)));
+  const el=r2d(Math.atan2(U, Math.sqrt(E*E+Nn*Nn)));
+  return {az, el};
+}
+
+/* ========= Compatibilidad sensores ========= */
+function supportsAbsoluteHeadingAPI(){
+  const hasAbs = ('ondeviceorientationabsolute' in window);
+  let hasWK = false;
+  try{ hasWK = (typeof DeviceOrientationEvent!=='undefined' &&
+                'webkitCompassHeading' in DeviceOrientationEvent.prototype); }catch(_){}
+  return hasAbs || hasWK;
+}
+
+/* ========= Sensores ========= */
+function computeHeadingFromEvent(e){
+  // En iOS: NO usar webkitCompassHeading (puede invertir 180° al inclinar),
+  // usar alpha (absoluto si está) + corrección por rotación de pantalla.
+  if (IS_IOS) {
+    if (e && e.alpha != null) {
+      // heading base: 360 - alpha (clockwise desde el norte)
+      let h = 360 - e.alpha;
+      // corregir por orientación de pantalla (portrait/landscape)
+      let ang = getScreenAngle();
+      // algunos iOS devuelven -90: normalizamos a [0,360)
+      if (ang < 0) ang += 360;
+      h = h + ang;
+      return wrap360(h);
+    }
+    return NaN;
+  }
+
+  // No-iOS: tu lógica original
+  if (typeof e.webkitCompassHeading==='number' && !isNaN(e.webkitCompassHeading)){
+    return wrap360(e.webkitCompassHeading);
+  }
+  if (e.absolute===true && e.alpha!=null){
+    return wrap360(360 - e.alpha);
+  }
+  if (e.alpha!=null){
+    // fallback legado
+    return wrap360(360 - e.alpha - 90);
+  }
+  return NaN;
+}
+
+function onDeviceOrientation(e){
+  const h=computeHeadingFromEvent(e);
+  if (isFinite(h)) state.heading=h;
+  state.pitch = (typeof e.beta==='number')? e.beta : 0;
+  state.roll  = (typeof e.gamma==='number')? e.gamma : 0;
+
+  if (isFinite(state.heading)){
+    const x=Math.cos(d2r(state.heading)), y=Math.sin(d2r(state.heading));
+    if (state.hx==null){ state.hx=x; state.hy=y; }
+    else{
+      const a=state.smooth;
+      state.hx=(1-a)*state.hx + a*x;
+      state.hy=(1-a)*state.hy + a*y;
+    }
+  }
+}
+function smoothedHeadingDeg(){
+  if(state.hx==null || state.hy==null) return (isFinite(state.heading)?state.heading:0);
+  return wrap360(r2d(Math.atan2(state.hy,state.hx)));
+}
+
+/* ========= Dibujo brújula ========= */
+function drawCompass(){
+  const w=compass.width, h=compass.height, cx=w/2, cy=h/2, r=Math.min(cx,cy)-16;
+  cctx.clearRect(0,0,w,h);
+  const g=cctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r);
+  g.addColorStop(0,'#111b2b'); g.addColorStop(1,'#0b111a');
+  cctx.fillStyle=g; cctx.beginPath(); cctx.arc(cx,cy,r,0,Math.PI*2); cctx.fill();
+  cctx.strokeStyle='rgba(255,255,255,.12)'; cctx.lineWidth=2; cctx.stroke();
+
+  cctx.save(); cctx.translate(cx,cy);
+  for(let d=0; d<360; d+=5){
+    const len=(d%45===0)?14:(d%10===0?10:6);
+    cctx.rotate(d2r(5));
+    cctx.beginPath(); cctx.moveTo(0,-r); cctx.lineTo(0,-r+len);
+    cctx.strokeStyle='rgba(255,255,255,.25)';
+    cctx.lineWidth=(d%45===0)?2:1; cctx.stroke();
+  }
+  cctx.restore();
+
+  const labels=[[0,'N'],[90,'E'],[180,'S'],[270,'O']];
+  cctx.fillStyle='white'; cctx.font='600 18px system-ui,sans-serif'; cctx.textAlign='center'; cctx.textBaseline='middle';
+  for(const [deg,txt] of labels){
+    const a=d2r(deg); const x=cx+Math.sin(a)*(r-26), y=cy-Math.cos(a)*(r-26);
+    cctx.fillText(txt,x,y);
+  }
+
+  const head=smoothedHeadingDeg();
+  const target=state.az ?? 0;
+
+  function needle(angle, color, inset){
+    cctx.save(); cctx.translate(cx,cy); cctx.rotate(d2r(angle));
+    cctx.beginPath(); cctx.moveTo(0,8); cctx.lineTo(6,0); cctx.lineTo(0,-r+inset); cctx.lineTo(-6,0); cctx.closePath();
+    cctx.fillStyle=color; cctx.fill(); cctx.restore();
+  }
+  needle(head,'rgba(79,209,197,.95)',24);
+  needle(target,'rgba(112,161,255,.95)',44);
+
+  cctx.fillStyle='rgba(0,0,0,.35)'; cctx.beginPath(); cctx.arc(cx,cy,54,0,Math.PI*2); cctx.fill();
+  cctx.fillStyle='white'; cctx.font='700 22px system-ui,sans-serif'; cctx.textAlign='center';
+  cctx.fillText(Math.round(head)+'°',cx,cy-6);
+  cctx.fillStyle='#9db1c7'; cctx.font='500 13px system-ui,sans-serif';
+  cctx.fillText('Alineá con el azimut objetivo',cx,cy+14);
+}
+
+/* ========= Cámara / AR ========= */
+function resizeOverlay(){
+  overlay.width = cam.clientWidth || cam.videoWidth || overlay.width;
+  overlay.height = cam.clientHeight || cam.videoHeight || overlay.height;
+}
+
+function arFrame(ts){
+  if(!state.gotCam || cam.readyState<2){ requestAnimationFrame(arFrame); return; }
+  resizeOverlay();
+  const W=overlay.width, H=overlay.height;
+  octx.clearRect(0,0,W,H);
+
+  const fH=state.fovH;
+  const fV=state.fovV ?? 40;
+  const fx=(W/2)/Math.tan(d2r(fH)/2);
+  const fy=(H/2)/Math.tan(d2r(fV)/2);
+
+  const trueHead = smoothedHeadingDeg();
+  const camPitch = (state.pitch||0)-90;
+  const rollDeg  = (state.roll||0);
+
+  const yawRel   = d2r(wrap180((state.az??0) - trueHead));
+  const pitchRel = d2r((state.el??0) - camPitch);
+
+  let Xc=Math.cos(pitchRel)*Math.sin(yawRel);
+  let Yc=Math.sin(pitchRel);
+  let Zc=Math.cos(pitchRel)*Math.cos(yawRel);
+
+  const r=d2r(rollDeg);
+  const Xr= Xc*Math.cos(-r) - Yc*Math.sin(-r);
+  const Yr= Xc*Math.sin(-r) + Yc*Math.cos(-r);
+  const Zr= Zc;
+
+  if(Zr>0){
+    const x=(fx*(Xr/Zr)) + W/2;
+    const y=(fy*(-Yr/Zr)) + H/2;
+
+    // Punto
+    octx.beginPath(); octx.arc(x,y,6,0,Math.PI*2);
+    octx.fillStyle='rgba(79,209,197,.95)'; octx.fill();
+
+    // Etiqueta
+    const label = Math.round(state.az??0)+'° / '+Math.round(state.el??0)+'°';
+    octx.font='600 13px system-ui,sans-serif'; octx.textBaseline='top';
+    const tw=octx.measureText(label).width+10;
+    octx.fillStyle='rgba(0,0,0,.5)'; octx.fillRect(x+10,y-2,tw,20);
+    octx.strokeStyle='rgba(255,255,255,.15)'; octx.strokeRect(x+10,y-2,tw,20);
+    octx.fillStyle='white'; octx.fillText(label,x+15,y);
+
+    // Retícula central
+    octx.beginPath(); octx.arc(W/2,H/2,16,0,Math.PI*2); octx.strokeStyle='rgba(255,255,255,.9)'; octx.lineWidth=2; octx.stroke();
+    octx.beginPath(); octx.arc(W/2,H/2,2,0,Math.PI*2); octx.fillStyle='#fff'; octx.fill();
+
+    // Chequeo de centrado
+    const dx=x-W/2, dy=y-H/2, dist=Math.sqrt(dx*dx+dy*dy);
+    const dt = (state.lastFrameTs? (ts-state.lastFrameTs): 16);
+    state.lastFrameTs = ts;
+    if(dist <= state.arTolPx){
+      state.arHoldAccum += dt;
+      arState.textContent = 'Centrado ('+Math.min(100,Math.round((state.arHoldAccum/state.arHoldMs)*100))+'%)';
+      if(state.arHoldAccum >= state.arHoldMs){ $('finish').disabled=false; }
+    } else {
+      state.arHoldAccum = Math.max(0, state.arHoldAccum - dt*0.5);
+      arState.textContent = 'Ajustando…';
+      $('finish').disabled=true;
+    }
+  } else {
+    arState.textContent = 'Objetivo detrás — eleve/apunte';
+    $('finish').disabled=true;
+  }
+
+  requestAnimationFrame(arFrame);
+}
+
+/* ========= Recorder circular ========= */
+async function startCircularRecorder(stream) {
+  if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+    if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264')) {
+      REC_MIME = 'video/mp4;codecs=h264';
+    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+      REC_MIME = 'video/webm;codecs=vp8';
+    } else if (MediaRecorder.isTypeSupported('video/webm')) {
+      REC_MIME = 'video/webm';
+    }
+  }
+  if (!REC_MIME) {
+    alert('Este navegador no soporta grabación de video.');
+    return;
+  }
+
+  // NUEVO: limpiar timer previo si existe (reinicios)
+  if (reqDataTimer) { clearInterval(reqDataTimer); reqDataTimer = null; }
+
+  webmSessionHeader = null; // si usás el fix de cabecera WebM
+  ringChunks = [];
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType: REC_MIME, videoBitsPerSecond: 2_000_000 });
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (!e.data || !e.data.size) return;
+
+    // cabecera WebM (si corresponde)
+    if (REC_MIME && REC_MIME.includes('webm') && !webmSessionHeader) {
+      webmSessionHeader = e.data;
+      return;
+    }
+
+    ringChunks.push(e.data);
+    if (ringChunks.length > KEEP_SECONDS) {
+      ringChunks.splice(0, ringChunks.length - KEEP_SECONDS);
+    }
+  };
+
+  mediaRecorder.onerror = (ev) => console.error('MediaRecorder error', ev.error);
+
+  // 👇 iOS ignora timeslice: arrancamos SIN timeslice y forzamos chunks con requestData()
+  if (IS_IOS) {
+    mediaRecorder.start(); // sin timeslice
+    reqDataTimer = setInterval(() => {
+      try { mediaRecorder.requestData(); } catch(_) {}
+    }, SLICE_MS); // 1000 ms
+  } else {
+    mediaRecorder.start(SLICE_MS); // como ya tenías
+  }
+}
+
+/* ========= GPS ========= */
+function startGeo(){
+  if(!navigator.geolocation){ return; }
+  navigator.geolocation.getCurrentPosition(function(p){
+    state.lat=p.coords.latitude; state.lon=p.coords.longitude; state.gotGPS=true;
+    dotGPS.style.background=state.gotGPS?'#22c55e':'#888';
+  }, function(_){
+    state.gotGPS=false; dotGPS.style.background='#888';
+  }, {enableHighAccuracy:true, timeout:8000});
+}
+
+/* ========= Permisos ========= */
+async function requestSensors(){
+  if(!supportsAbsoluteHeadingAPI()){ compatError.hidden=false; return false; }
+  return new Promise((resolve)=>{
+    let ok=false;
+    function one(e){
+      const h=computeHeadingFromEvent(e);
+      if(isFinite(h)){ ok=true; window.removeEventListener('deviceorientation',one,true); resolve(true); }
+    }
+    try{
+      if (typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+        DeviceOrientationEvent.requestPermission().then(res=>{
+          if(res!=='granted'){ resolve(false); return; }
+          window.addEventListener('deviceorientation', onDeviceOrientation, true);
+          window.addEventListener('deviceorientation', one, true);
+          setTimeout(()=>resolve(ok),1500);
+        });
+      } else {
+        if ('ondeviceorientationabsolute' in window){
+          window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+        } else {
+          window.addEventListener('deviceorientation', onDeviceOrientation, true);
+        }
+        window.addEventListener('deviceorientation', one, true);
+        setTimeout(()=>resolve(ok),1500);
+      }
+    }catch(_){ resolve(false); }
+  });
+}
+async function requestCamera(){
+  if(!navigator.mediaDevices?.getUserMedia) return false;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false // cambiar a true si querés audio ambiente
+    });
+    cam.srcObject = stream; await cam.play();
+    state.gotCam = true; dotCam.style.background='#22c55e';
+
+    // === NUEVO: canvas de mezcla (cámara + overlay) ===
+    // Dimensiones nativas del video
+    const vw = cam.videoWidth || 640, vh = cam.videoHeight || 360;
+
+    // Aseguramos que el overlay tenga algún tamaño; luego en arFrame se actualiza
+    overlay.width = overlay.width || vw;
+    overlay.height = overlay.height || vh;
+
+    // Canvas donde se mezcla video + overlay para grabar
+    recCanvas = document.createElement('canvas');
+    recCanvas.width = vw;
+    recCanvas.height = vh;
+    recCtx = recCanvas.getContext('2d', { alpha: false });
+
+    // Loop de mezcla: dibuja cámara y luego overlay por arriba
+    (function mixFrame(){
+      // cámara a tamaño nativo
+      recCtx.drawImage(cam, 0, 0, recCanvas.width, recCanvas.height);
+      // overlay escalado al tamaño del canvas de mezcla
+      recCtx.drawImage(overlay, 0, 0, recCanvas.width, recCanvas.height);
+      requestAnimationFrame(mixFrame);
+    })();
+
+    // Stream para grabar: sale del canvas de mezcla (incluye overlay)
+    recStream = recCanvas.captureStream(30); // 30 fps aprox.
+
+    // 👇 En iOS, adjuntamos una pista de audio silenciosa para que MediaRecorder emita data
+    if (IS_IOS) {
+      try {
+        const silent = await createSilentAudioTrack();
+        if (silent) {
+          const videoTrack = recStream.getVideoTracks()[0];
+          const mixed = new MediaStream();
+          if (videoTrack) mixed.addTrack(videoTrack);
+          mixed.addTrack(silent);
+          recStream = mixed; // a partir de ahora grabamos este stream con audio silencioso
+        }
+      } catch(_) {}
+    }
+
+    // FOV V una sola vez
+    const fh=d2r(state.fovH);
+    const fv=2*Math.atan(Math.tan(fh/2)*(vh/vw));
+    state.fovV = Math.max(20, Math.min(120, r2d(fv)));
+    fovVread.textContent = Math.round(state.fovV);
+
+    // iniciar grabación circular **desde el stream compuesto**
+    await startCircularRecorder(recStream);   // ⬅️ antes era: startCircularRecorder(stream)
+
+    requestAnimationFrame(arFrame);
+    return true;
+  }catch(_){ state.gotCam=false; return false; }
+}
+
+async function createSilentAudioTrack(){
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  const ac = new AC();
+  try { await ac.resume(); } catch(_) {}
+
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+  gain.gain.value = 0.00001; // casi 0 => silencio
+  const dest = ac.createMediaStreamDestination();
+
+  osc.connect(gain);
+  gain.connect(dest);
+  try { osc.start(); } catch(_) {}
+
+  // Devolvemos la pista para mezclar en el stream de grabación
+  const track = dest.stream.getAudioTracks()[0] || null;
+  return track;
+}
+
+/* ========= Navegación ========= */
+function goto(step){
+  step1.hidden = step!==1;
+  step2.hidden = step!==2;
+  step3.hidden = step!==3;
+  step4.hidden = step!==4;
+}
+
+/* ========= Lógica de pasos ========= */
+askPerms.addEventListener('click', async ()=>{
+  compatError.hidden=true; horizonError.hidden=true;
+
+  const okSensors = await requestSensors();
+  state.gotSensors = okSensors;
+  dotSensors.style.background = okSensors? '#22c55e' : '#888';
+  if(!okSensors){ compatError.hidden=false; return; }
+
+  await new Promise(res=>{ startGeo(); setTimeout(res, 1200); });
+  if(!state.gotGPS){ await new Promise(res=>{ startGeo(); setTimeout(res,1000); }); }
+  dotGPS.style.background = state.gotGPS? '#22c55e' : '#888';
+
+  const okCam = await requestCamera();
+  dotCam.style.background = okCam? '#22c55e' : '#888';
+  if(!okCam){ alert('No fue posible acceder a la cámara.'); return; }
+
+  if(state.gotGPS){
+    const {az,el} = azElToGeoSat(state.lat, state.lon, SAT_LON_DEG);
+    state.az=az; state.el=el;
+    tgtAz.textContent = Math.round(az);
+    tgtEl.textContent = Math.round(el);
+    if(el < 0){
+      horizonError.hidden=false;
+      goStep1Next.disabled = true;
+      return;
+    }
+  } else {
+    alert('No se pudo obtener tu ubicación. Por favor, habilitá GPS.');
+    return;
+  }
+
+  goStep1Next.disabled = false;
+});
+
+goStep1Next.addEventListener('click', ()=> { goto(2); });
+
+btnBack2.addEventListener('click', ()=> goto(1));
+
+btnNext2.addEventListener('click', ()=> {
+  overlay.width = cam.clientWidth||cam.videoWidth;
+  overlay.height= cam.clientHeight||cam.videoHeight;
+  goto(3);
+});
+
+btnBack3.addEventListener('click', ()=> goto(2));
+
+/* === Finalizar: subir últimos 15s (o descargar si falla) === */
+btnFinish.addEventListener('click', async () => {
+
+  // Forzar un último chunk en iOS antes de leer el buffer
+  if (IS_IOS && mediaRecorder && mediaRecorder.state === 'recording') {
+    try { mediaRecorder.requestData(); } catch(_) {}
+    await new Promise(r => setTimeout(r, 150)); // dar tiempo a ondataavailable
+  }
+  if (!ringChunks.length) {
+    alert('No hay video en buffer para guardar.');
+    goto(4);
+    return;
+  }
+
+  // Armar el clip final
+  let clipBlob;
+  let uploadExt;
+
+  if (REC_MIME && REC_MIME.includes('webm')) {
+    // Unimos cabecera + últimos 15s para que el WebM tenga EBML válido
+    const parts = [];
+    if (typeof webmSessionHeader !== 'undefined' && webmSessionHeader) {
+      parts.push(webmSessionHeader);
+    }
+    parts.push(...ringChunks);
+    clipBlob = new Blob(parts, { type: 'video/webm' });
+    uploadExt = 'webm';
+  } else {
+    // MP4 (o lo que sea que el navegador soporte)
+    clipBlob = new Blob(ringChunks, { type: REC_MIME || 'video/mp4' });
+    uploadExt = (REC_MIME && REC_MIME.includes('mp4')) ? 'mp4' : 'mp4';
+  }
+
+  const meta = {
+    lat: state.lat, lon: state.lon,
+    az: Math.round(state.az ?? 0),
+    el: Math.round(state.el ?? 0),
+    fovH: state.fovH,
+    fovV: Math.round(state.fovV ?? 0),
+    ts: new Date().toISOString()
+  };
+
+  try {
+    const fd = new FormData();
+    fd.append('video', clipBlob, `apuntamiento_${Date.now()}.${uploadExt}`);
+    fd.append('meta', JSON.stringify(meta));
+    const res = await fetch('upload_video.php', { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const out = await res.json();
+    console.log('Subida OK', out);
+  } catch (err) {
+    console.warn('Fallo al subir. Ofrezco descarga local.', err);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(clipBlob);
+    a.download = `apuntamiento_${Date.now()}.${uploadExt}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  goto(4);
+});
+
+
+/* ========= Animación Step 2 ========= */
+function updateStep2(){
+  if (step2.hidden){ requestAnimationFrame(updateStep2); return; }
+  const head=smoothedHeadingDeg();
+  curHead.textContent = Math.round(head);
+  drawCompass();
+
+  const diff = Math.abs(wrap180((state.az??0) - head));
+  const pct = Math.max(0, 100 - (diff/state.azTol)*100);
+  azMeter.style.width = Math.min(100, Math.round(pct))+'%';
+
+  if (diff <= state.azTol){
+    azHint.textContent = '¡Perfecto! Mantené unos instantes y presioná “Siguiente”.';
+    btnNext2.disabled=false;
+  } else {
+    azHint.textContent = 'Girá el teléfono hasta estar dentro de ±'+state.azTol+'°';
+    btnNext2.disabled=true;
+  }
+  requestAnimationFrame(updateStep2);
+}
+
+/* ========= Inicio ========= */
+goto(1);
+requestAnimationFrame(updateStep2);
+
+})();</script>
+</body>
+</html>

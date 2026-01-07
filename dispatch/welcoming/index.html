@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insat - Verificación</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="story-container">
+        <div id="back-button" class="btn-back" onclick="app.prev()" style="display: none; left: 15px; right: auto;">
+            <img src="left.png" alt="Volver" class="back-icon">
+        </div>
+        <div id="toast">Cambios guardados</div>
+
+        <div class="progress-bar-container" id="progress-bar">
+            </div>
+
+        <div class="header">
+            <img src="https://insat.com.ar/img/favicon.png" alt="Insat">
+            <span>Insat</span>
+        </div>
+
+        <div id="story-viewport" class="viewport">
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

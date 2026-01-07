@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insat - Verificación de Datos</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000; color: #000; overflow: hidden;
+        }
+
+        .story-container {
+            position: relative; width: 100%; max-width: 480px; height: 100vh;
+            margin: 0 auto; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 20px; box-sizing: border-box; overflow: hidden;
+        }
+
+        .story-container::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('background-gradient-lights_23-2149304973.jpg'); 
+            background-size: cover; background-position: center;
+            filter: blur(15px); z-index: 0; transform: scale(1.1);
+        }
+
+        /* BARRA DE PROGRESO */
+        .progress-bar-container {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            height: 2px; display: flex; gap: 5px; z-index: 3;
+        }
+        .progress-segment { height: 100%; background: rgba(255, 255, 255, 0.3); flex: 1; border-radius: 2px; }
+        .progress-fill { height: 100%; width: 0%; background: white; transition: width 0.3s; }
+        .fill-active { width: 100%; }
+
+        .header {
+            position: absolute; top: 25px; left: 15px; display: flex; align-items: center; z-index: 3;
+        }
+        .header img { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; border: 1px solid rgba(255,255,255,0.3); }
+        .header span { font-weight: 600; font-size: 14px; color: white; text-shadow: 0px 1px 2px rgba(0,0,0,0.3); }
+
+        /* QA STICKER */
+        .qa-card {
+            width: 100%; max-width: 320px; background: white; border-radius: 15px;
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 2; margin-bottom: 15px;
+        }
+        .qa-header { background-color: #262626; color: white; padding: 12px; font-weight: bold; font-size: 15px; }
+        .qa-body { padding: 10px 20px; text-align: left; max-height: 280px; overflow-y: auto; }
+        
+        .info-item { margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 4px; position: relative; }
+        .info-item:last-child { border-bottom: none; }
+        .label { color: #8e8e8e; font-size: 9px; font-weight: 700; text-transform: uppercase; }
+        .value { color: #262626; font-size: 13px; display: block; min-height: 1.2em; }
+
+        /* INPUTS Y ERRORES */
+        .edit-input { width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 4px; font-size: 13px; outline: none; box-sizing: border-box; }
+        .edit-input:focus { border-color: #0095f6; }
+        .error-text { color: #ff3b30; font-size: 9px; display: none; margin-top: 2px; font-weight: 600; }
+
+        /* MAPA CON ZOOM */
+        .map-frame {
+            width: 100%; max-width: 320px; height: 160px; background: #eee;
+            border-radius: 15px; overflow: hidden; z-index: 2; margin-bottom: 15px;
+            border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* BOTONES */
+        .buttons { display: flex; flex-direction: column; width: 100%; max-width: 320px; z-index: 2; margin-bottom: 80px; }
+        button { padding: 14px; margin: 4px 0; font-size: 14px; font-weight: 700; border-radius: 12px; cursor: pointer; border: none; }
+        .confirm-btn { background: white; color: #0095f6; }
+        .incorrect-btn { background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); }
+        .save-btn { background: #4CAF50; color: white; display: none; }
+
+        /* BARRA DE COMENTARIOS */
+        .comment-bar {
+            position: absolute; bottom: 20px; width: calc(100% - 40px);
+            max-width: 440px; display: flex; gap: 10px; z-index: 3; align-items: center;
+        }
+        .comment-bar input {
+            flex: 1; padding: 12px 18px; border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.4); background: transparent;
+            color: white; outline: none; font-size: 14px;
+        }
+        .send-btn { background: none; color: white; font-weight: bold; font-size: 14px; cursor: pointer; }
+
+        /* NOTIFICACIÓN TOAST */
+        #toast {
+            position: absolute; top: 70px; background: rgba(0, 0, 0, 0.8); color: white;
+            padding: 8px 15px; border-radius: 20px; font-size: 13px; z-index: 4;
+            display: none;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (min-width: 768px) {
+            body { background-color: #1a1a1a; display: flex; justify-content: center; align-items: center; }
+            .story-container { border-radius: 15px; height: 90vh; max-height: 850px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast">Cambios guardados</div>
+
+    <div class="story-container">
+        <div class="progress-bar-container">
+            <div class="progress-segment"><div id="fill-1" class="progress-fill fill-active"></div></div>
+            <div class="progress-segment"><div id="fill-2" class="progress-fill"></div></div>
+            <div class="progress-segment"><div id="fill-3" class="progress-fill"></div></div>
+            <div class="progress-segment"><div id="fill-4" class="progress-fill"></div></div>
+            <div class="progress-segment"><div id="fill-5" class="progress-fill"></div></div>
+        </div>
+
+        <div class="header">
+            <img src="https://insat.com.ar/img/favicon.png" alt="Insat">
+            <span>Insat</span>
+        </div>
+
+        <div id="story-1" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div class="qa-card">
+                <div class="qa-header" id="card-title-1">Validación de datos</div>
+                <div class="qa-body">
+                    <div class="info-item">
+                        <span class="label">Nombre</span>
+                        <span class="value" id="val-nombre">Juan Perez</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">DNI / CUIL / CUIT</span>
+                        <span class="value" id="val-id">38990755</span>
+                        <div class="error-text" id="err-id">7 a 11 números, sin puntos ni guiones</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Teléfono 1</span>
+                        <span class="value" id="val-tel1">1154903344</span>
+                        <div class="error-text" id="err-tel1">Debe tener 10 dígitos</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Teléfono 2</span>
+                        <span class="value" id="val-tel2">1154903345</span>
+                        <div class="error-text" id="err-tel2">Debe tener 10 dígitos</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Email</span>
+                        <span class="value" id="val-email">juanperez@gmail.com</span>
+                        <div class="error-text" id="err-email">Email inválido</div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button id="btn-confirm-1" class="confirm-btn" onclick="goToStory2()">La información es correcta</button>
+                <button id="btn-edit-1" class="incorrect-btn" onclick="enableEdit1()">La información es incorrecta</button>
+                <button id="btn-save-1" class="save-btn" onclick="saveChanges1()">Guardar cambios</button>
+            </div>
+        </div>
+
+        <div id="story-2" class="hidden" style="width: 100%; flex-direction: column; align-items: center;">
+            <div class="qa-card">
+                <div class="qa-header" id="card-title-2">Datos del Domicilio</div>
+                <div class="qa-body">
+                    <div class="info-item">
+                        <span class="label">Dirección</span>
+                        <span class="value" id="val-dir">Av. San pedrito 8</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Localidad</span>
+                        <span class="value" id="val-loc">CABA</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Provincia</span>
+                        <span class="value" id="val-prov">Buenos Aires</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Latitud</span>
+                        <span class="value" id="val-lat">-34.631687</span>
+                        <div class="error-text" id="err-lat">Latitud inválida (-90 a 90)</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Longitud</span>
+                        <span class="value" id="val-lng">-58.469041</span>
+                        <div class="error-text" id="err-lng">Longitud inválida (-180 a 180)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-frame">
+                <iframe id="map-iframe" width="100%" height="100%" frameborder="0" 
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=-58.4710,-34.6336,-58.4670,-34.6296&layer=mapnik&marker=-34.631687,-58.469041">
+                </iframe>
+            </div>
+
+            <div class="buttons">
+                <button id="btn-confirm-2" class="confirm-btn" onclick="alert('Proceso completado con éxito')">El domicilio es correcto</button>
+                <button id="btn-edit-2" class="incorrect-btn" onclick="enableEdit2()">El domicilio es incorrecto</button>
+                <button id="btn-save-2" class="save-btn" onclick="saveChanges2()">Guardar cambios</button>
+            </div>
+        </div>
+
+        <div class="comment-bar">
+            <input type="text" id="comment" placeholder="Escribe un mensaje...">
+            <button class="send-btn" onclick="sendComment()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA GENERAL ---
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg || "Cambios guardados";
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 2000);
+        }
+
+        function sendComment() {
+            const msg = document.getElementById('comment').value;
+            if (msg.trim()) window.location.href = `https://wa.me/5491154903344?text=${encodeURIComponent(msg)}`;
+        }
+
+        // --- STORY 1 ---
+        const fields1 = ['nombre', 'id', 'tel1', 'tel2', 'email'];
+
+        function goToStory2() {
+            document.getElementById('story-1').classList.add('hidden');
+            document.getElementById('story-2').classList.remove('hidden');
+            document.getElementById('story-2').style.display = 'flex';
+            document.getElementById('fill-2').classList.add('fill-active');
+        }
+
+        function enableEdit1() {
+            document.getElementById('card-title-1').innerText = "Corregir datos personales";
+            document.getElementById('btn-confirm-1').style.display = "none";
+            document.getElementById('btn-edit-1').style.display = "none";
+            document.getElementById('btn-save-1').style.display = "block";
+            fields1.forEach(f => {
+                const span = document.getElementById(`val-${f}`);
+                span.innerHTML = `<input type="text" class="edit-input" id="input-${f}" value="${span.innerText}">`;
+            });
+        }
+
+        function saveChanges1() {
+            const rules = { id: /^\d{7,11}$/, tel1: /^\d{10}$/, tel2: /^\d{10}$/, email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ };
+            let valid = true;
+            ['id', 'tel1', 'tel2', 'email'].forEach(f => {
+                const val = document.getElementById(`input-${f}`).value;
+                const err = document.getElementById(`err-${f}`);
+                if (!rules[f].test(val)) { err.style.display = 'block'; valid = false; }
+                else { err.style.display = 'none'; }
+            });
+
+            if (valid) {
+                fields1.forEach(f => {
+                    const val = document.getElementById(`input-${f}`).value;
+                    document.getElementById(`val-${f}`).innerText = val;
+                });
+                document.getElementById('btn-confirm-1').style.display = "block";
+                document.getElementById('btn-edit-1').style.display = "block";
+                document.getElementById('btn-save-1').style.display = "none";
+                document.getElementById('card-title-1').innerText = "Validación de datos";
+                showToast();
+            }
+        }
+
+        // --- STORY 2 ---
+        const fields2 = ['dir', 'loc', 'prov', 'lat', 'lng'];
+
+        function enableEdit2() {
+            document.getElementById('card-title-2').innerText = "Corregir domicilio";
+            document.getElementById('btn-confirm-2').style.display = "none";
+            document.getElementById('btn-edit-2').style.display = "none";
+            document.getElementById('btn-save-2').style.display = "block";
+            fields2.forEach(f => {
+                const span = document.getElementById(`val-${f}`);
+                span.innerHTML = `<input type="text" class="edit-input" id="input-${f}" value="${span.innerText}">`;
+            });
+        }
+
+        function saveChanges2() {
+            const latVal = parseFloat(document.getElementById('input-lat').value);
+            const lngVal = parseFloat(document.getElementById('input-lng').value);
+            let valid = true;
+
+            if (isNaN(latVal) || latVal < -90 || latVal > 90) {
+                document.getElementById('err-lat').style.display = 'block'; valid = false;
+            } else { document.getElementById('err-lat').style.display = 'none'; }
+
+            if (isNaN(lngVal) || lngVal < -180 || lngVal > 180) {
+                document.getElementById('err-lng').style.display = 'block'; valid = false;
+            } else { document.getElementById('err-lng').style.display = 'none'; }
+
+            if (valid) {
+                fields2.forEach(f => {
+                    const val = document.getElementById(`input-${f}`).value;
+                    document.getElementById(`val-${f}`).innerText = val;
+                });
+                document.getElementById('btn-confirm-2').style.display = "block";
+                document.getElementById('btn-edit-2').style.display = "block";
+                document.getElementById('btn-save-2').style.display = "none";
+                document.getElementById('card-title-2').innerText = "Datos del Domicilio";
+                
+                // Actualizar mapa con zoom cercano (margen de 0.002)
+                const newLat = parseFloat(document.getElementById('val-lat').innerText);
+                const newLng = parseFloat(document.getElementById('val-lng').innerText);
+                const margin = 0.002; 
+                document.getElementById('map-iframe').src = `https://www.openstreetmap.org/export/embed.html?bbox=${newLng-margin},${newLat-margin},${newLng+margin},${newLat+margin}&layer=mapnik&marker=${newLat},${newLng}`;
+                
+                showToast("Ubicación actualizada");
+            }
+        }
+    </script>
+</body>
+</html>

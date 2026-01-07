@@ -1,0 +1,7 @@
+/* v1.4 ajustes de layout */
+.card .card-body { display: block; }
+.h-100.d-flex .card-body { display: flex; flex-direction: column; }
+/* Asegura que el botón de Finalizar quede abajo cuando hay contenido variable */
+.mt-auto { margin-top: auto !important; }
+/* Elimina espacio superior accidental */
+body > .container > .mb-3:first-child { margin-top: 0 !important; }

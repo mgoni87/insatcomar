@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Satellite Tools · Secuencial</title>
+  <style>
+    :root{
+      --bg:#0b0f14;--panel:#111823;--muted:#8aa0b3;--text:#e6eef6;
+      --ok:#22c55e;--bad:#ef4444;--accent:#60a5fa;--accent2:#34d399
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#0b0f14,#0c1722 40%,#0b0f14);color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:6px 0 14px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:34px;height:34px;border-radius:10px;background:radial-gradient(ellipse at 30% 30%,#5df,transparent 40%),linear-gradient(135deg,#1d2740,#0f172a)}
+    /* stepper */
+    .stepper{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .step{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.05);opacity:.6}
+    .step.active{opacity:1;border-color:#41506a;background:linear-gradient(180deg,#1f2a40,#101827)}
+    .step .dot{width:22px;height:22px;border-radius:999px;display:grid;place-items:center;
+      border:1px solid rgba(255,255,255,.15);background:#0e1622;font-weight:700}
+    .step .lbl{font-weight:600}
+    .step.done .dot{background:var(--accent2)}
+    .card{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:14px}
+    .card .hd{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between}
+    .card .bd{padding:12px 14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--text);padding:9px 14px;border-radius:10px;cursor:pointer}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .btn.primary{border-color:#294269;background:linear-gradient(180deg,#264466,#1b2c45)}
+    input,select{background:#0e1622;border:1px solid rgba(255,255,255,.15);color:var(--text);padding:8px 10px;border-radius:8px}
+    .muted{color:var(--muted)}
+    .list{display:grid;gap:6px;max-height:60vh;overflow:auto}
+    .item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;background:rgba(255,255,255,.03)}
+    .tag{padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
+    canvas, video {display:block;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.1)}
+    .stack{position:relative}
+    #compass, #compassSimple{background:#0b111a}
+    #overlay{position:absolute;inset:0;pointer-events:none;background:transparent}
+    .panel{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);border-radius:12px;padding:10px;max-height:40vh;overflow:auto}
+    .check{display:flex;align-items:center;gap:8px;margin:6px 0}
+    .bar{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+    .grid{display:grid;gap:14px}
+    .grid.cols-3{grid-template-columns:320px 1fr}
+    @media (max-width:960px){.grid.cols-3{grid-template-columns:1fr}}
+    .help{padding:10px;border-radius:10px;border:1px dashed rgba(255,255,255,.15);background:rgba(255,255,255,.03)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo"></div><strong>Satellite Tools</strong></div>
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="1"><div class="dot">1</div><div class="lbl">Inicio</div></div>
+      <div class="step" data-step="2"><div class="dot">2</div><div class="lbl">Finder</div></div>
+      <div class="step" data-step="3"><div class="dot">3</div><div class="lbl">AR</div></div>
+    </div>
+  </header>
+
+  <!-- PASO 1 · INICIO -->
+  <section id="step-1">
+    <div class="card">
+      <div class="hd"><strong>Permisos & Calibración</strong><span class="muted">iOS requiere permitir sensores</span></div>
+      <div class="bd">
+        <div class="row">
+          <button type="button" id="btnSensors" class="btn">Habilitar sensores</button>
+          <button type="button" id="btnLocation" class="btn">Usar mi ubicación</button>
+          <button type="button" id="btnCalibrate" class="btn">Calibrar Norte</button>
+          <span id="permStatus" class="muted">Sensores: — · Ubicación: —</span>
+        </div>
+        <div class="row">
+          <label>Declinación (°) <input id="declination" type="number" step="0.1" value="0"></label>
+          <label>Offset heading (°) <input id="headingOffset" type="number" step="0.1" value="0"></label>
+          <label>Offset cámara (°) <input id="cameraAlign" type="number" step="1" value="0"></label>
+          <span class="muted">Si no coincide, afiná con estos valores.</span>
+        </div>
+        <div class="row">
+          <label>Lat <input id="latInput" type="number" step="0.0001" value="-34.6037"></label>
+          <label>Lon <input id="lonInput" type="number" step="0.0001" value="-58.3816"></label>
+          <button type="button" class="btn" id="applyLL">Aplicar</button>
+          <span id="llStatus" class="muted"></span>
+        </div>
+        <div class="help muted">
+          <strong>Paso 1:</strong> habilitá sensores y GPS si es posible. También podés ingresar lat/lon manualmente y presionar <em>Aplicar</em>.
+        </div>
+        <div class="bar">
+          <span></span>
+          <button class="btn primary" id="next-1">Siguiente: Finder</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 2 · FINDER -->
+  <section id="step-2" hidden>
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="hd">
+          <strong>Satélites GEO</strong>
+          <div class="row"><input id="search" placeholder="Buscar"><button type="button" class="btn" id="btnAddSat">Agregar</button></div>
+        </div>
+        <div class="bd"><div id="satList" class="list"></div></div>
+      </div>
+      <div class="card">
+        <div class="hd"><strong>Brújula dirigida</strong><span id="selectedName" class="muted">Ninguno</span></div>
+        <div class="bd">
+          <div class="help muted">
+            <strong>Paso 2:</strong> apoyá el teléfono <em>acostado</em> y apuntá con el <em>borde superior</em> hacia el azimut del satélite.
+            Hacé coincidir la aguja con el objetivo.
+          </div>
+          <div class="row"><label>Mostrar bajo horizonte <input type="checkbox" id="showBelow"></label></div>
+          <canvas id="compass" width="700" height="700"></canvas>
+          <div class="row">
+            <span>Heading:</span><strong id="headingVal">—</strong>
+            <span>Az sat:</span><strong id="azVal">—</strong>
+            <span>El sat:</span><strong id="elVal">—</strong>
+            <span>Estado:</span><span id="statusVal" class="tag">—</span>
+          </div>
+          <div class="bar">
+            <button class="btn" id="prev-2">Anterior</button>
+            <button class="btn primary" id="next-2" disabled>Siguiente: AR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PASO 3 · AR -->
+  <section id="step-3" hidden>
+    <div class="card">
+      <div class="hd">
+        <strong>AR View</strong>
+        <span id="arHeaderInfo" class="muted">Sin selección</span>
+      </div>
+      <div class="bd">
+        <div class="help muted" id="arHelp">
+          <strong>Paso 3:</strong> levantá el teléfono <em>90°</em> (vertical) y continuá elevando
+          hasta el ángulo de elevación indicado para alinear el punto con la retícula.
+        </div>
+        <div class="row">
+          <label>FOV H (°) <input id="fovH" type="number" step="1" value="60"></label>
+          <label>FOV V (°) <input id="fovV" type="number" step="1" value="40"></label>
+          <label>Mostrar bajo horizonte <input type="checkbox" id="arShowBelow"></label>
+          <button type="button" class="btn" id="startCam">Iniciar cámara</button>
+        </div>
+        <!-- Lista AR bloqueada (se oculta en modo secuencial) -->
+        <div id="arPane" class="panel" hidden></div>
+
+        <div class="stack" style="margin-top:10px">
+          <video id="camera" playsinline muted></video>
+          <canvas id="overlay"></canvas>
+        </div>
+
+        <div class="bar">
+          <button class="btn" id="prev-3">Anterior</button>
+          <button class="btn" id="restart">Reiniciar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRÚJULA SIMPLE (opcional oculta, útil para pruebas) -->
+  <section id="view-compass" hidden>
+    <div class="card">
+      <div class="hd"><strong>Compass</strong><span class="muted">Brújula simple</span></div>
+      <div class="bd"><canvas id="compassSimple" width="700" height="700"></canvas></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){ 'use strict';
+/* ==========================
+   Utilidades
+========================== */
+function d2r(d){return d*Math.PI/180;} function r2d(r){return r*180/Math.PI;}
+function wrap360(d){d=d%360;if(d<0)d+=360;return d;}
+function wrap180(d){return ((d+180)%360+360)%360-180;}
+function $(id){return document.getElementById(id);}
+
+/* ==========================
+   Estado global
+========================== */
+var state={
+  step:1,
+  lat:-34.6037, lon:-58.3816,
+  heading:NaN, pitch:0, roll:0,
+  declination:0, headingOffset:0, cameraAlign:0, calibOffset:0,
+  selectedSat:null,
+  permissionSensors:false, permissionLocation:false,
+  lockSingle:false // en AR secuencial: true => sólo satélite elegido
+};
+
+/* ==========================
+   DOM
+========================== */
+var stepper=$('stepper');
+function markStep(n){
+  state.step=n;
+  var steps = stepper.querySelectorAll('.step');
+  for (var i=0;i<steps.length;i++){
+    var s=steps[i], idx=Number(s.getAttribute('data-step'));
+    s.classList.toggle('active',idx===n);
+    s.classList.toggle('done',idx<n);
+  }
+  $('step-1').hidden = (n!==1);
+  $('step-2').hidden = (n!==2);
+  $('step-3').hidden = (n!==3);
+}
+
+var btnSensors=$('btnSensors'), btnLocation=$('btnLocation'), btnCalibrate=$('btnCalibrate'), permStatus=$('permStatus');
+var declinationEl=$('declination'), headingOffsetEl=$('headingOffset'), cameraAlignEl=$('cameraAlign');
+var latInput=$('latInput'), lonInput=$('lonInput'), applyLL=$('applyLL'), llStatus=$('llStatus');
+
+var compass=$('compass'), ctx=compass.getContext('2d');
+var compassSimple=$('compassSimple'), ctxS=compassSimple.getContext('2d');
+var headingVal=$('headingVal'), azVal=$('azVal'), elVal=$('elVal'), statusVal=$('statusVal');
+
+var search=$('search'), satList=$('satList'), selectedName=$('selectedName'), showBelow=$('showBelow');
+
+var fovH=$('fovH'), fovV=$('fovV'), arShowBelow=$('arShowBelow');
+var cam=$('camera'), overlay=$('overlay'), octx=overlay.getContext('2d');
+var arHeaderInfo=$('arHeaderInfo'), arHelp=$('arHelp');
+
+/* ==========================
+   Catálogo de satélites GEO
+========================== */
+var SATS=[
+  {name:'ARSAT-1',lon:-71.8},{name:'ARSAT-2',lon:-81.0},{name:'Amazonas 3',lon:-61.0},{name:'Hispasat 30W-6',lon:-30.0},
+  {name:'Intelsat 11',lon:-43.0},{name:'Intelsat 14',lon:-45.0},{name:'Intelsat 34',lon:-55.5},{name:'Intelsat 35e',lon:-34.5},
+  {name:'SES-6',lon:-40.5},{name:'Eutelsat 65W A',lon:-65.0},{name:'Eutelsat 117W A',lon:-116.8},{name:'Star One C2',lon:-70.0},
+  {name:'Star One C3',lon:-75.0},{name:'Galaxy 28',lon:-89.0},{name:'Galaxy 19',lon:-97.0},{name:'NSS 806',lon:-47.5},
+  {name:'DirecTV 17',lon:-76.0},{name:'DirecTV 12',lon:-103.0},{name:'SES-17',lon:-67.1}
+];
+
+function addSatellite(){
+  var name=prompt('Nombre del satélite:'); if(!name) return;
+  var lon=Number(prompt('Longitud subsatelital (°). Oeste negativo / Este positivo'));
+  if(!isFinite(lon)||lon<-180||lon>180){alert('Longitud inválida');return;}
+  SATS.push({name:name,lon:lon});
+  renderSatList();
+}
+
+/* ==========================
+   Azimut/Elevación a GEO
+========================== */
+function azElToGeoSat(latDeg, lonDeg, satLonDeg){
+  var a=6378137.0, e2=6.69437999014e-3, Rgeo=42164e3;
+  var lat=d2r(latDeg), lon=d2r(lonDeg), satLon=d2r(satLonDeg);
+  var N=a/Math.sqrt(1-e2*Math.sin(lat)*Math.sin(lat));
+  var xo=N*Math.cos(lat)*Math.cos(lon), yo=N*Math.cos(lat)*Math.sin(lon), zo=(N*(1-e2))*Math.sin(lat);
+  var xs=Rgeo*Math.cos(satLon), ys=Rgeo*Math.sin(satLon), zs=0;
+  var dx=xs-xo, dy=ys-yo, dz=zs-zo;
+  var sinLat=Math.sin(lat), cosLat=Math.cos(lat), sinLon=Math.sin(lon), cosLon=Math.cos(lon);
+  var E=-sinLon*dx+cosLon*dy;
+  var Nn=-sinLat*cosLon*dx - sinLat*sinLon*dy + cosLat*dz;
+  var U=cosLat*cosLon*dx + cosLat*sinLon*dy + sinLat*dz;
+  var az=wrap360(r2d(Math.atan2(E,Nn)));
+  var el=r2d(Math.atan2(U, Math.sqrt(E*E+Nn*Nn)));
+  return {az:az, el:el};
+}
+
+/* ==========================
+   Ubicación y permisos
+========================== */
+var geoWatchId=null;
+function setLocation(lat,lon,tag){
+  state.lat=lat; state.lon=lon;
+  latInput.value=lat.toFixed(4); lonInput.value=lon.toFixed(4);
+  try{localStorage.setItem('sat_lat',lat);localStorage.setItem('sat_lon',lon);}catch(_){}
+  if(llStatus) llStatus.textContent=(tag||'Ubicación aplicada')+' · lat '+lat.toFixed(4)+', lon '+lon.toFixed(4);
+  renderSatList();
+}
+function startGeo(){
+  if(!navigator.geolocation){ if(llStatus) llStatus.textContent='Geoloc no disponible'; return; }
+  try{ if(geoWatchId!==null) navigator.geolocation.clearWatch(geoWatchId); }catch(_){}
+  geoWatchId=navigator.geolocation.watchPosition(
+    function(p){ setLocation(p.coords.latitude,p.coords.longitude,'GPS ('+Math.round(p.coords.accuracy)+'m)'); state.permissionLocation=true; updatePermStatus(); },
+    function(e){ state.permissionLocation=false; updatePermStatus(); if(llStatus) llStatus.textContent='Error ubicación: '+e.message; },
+    {enableHighAccuracy:true, maximumAge:5000, timeout:10000}
+  );
+}
+function enableLocation(){
+  if(location.protocol!=='https:' && location.hostname!=='localhost'){
+    if(llStatus) llStatus.textContent='HTTPS recomendado para GPS';
+  }
+  startGeo();
+}
+function updatePermStatus(){
+  if(permStatus) permStatus.textContent='Sensores: '+(state.permissionSensors?'OK':'—')+' · Ubicación: '+(state.permissionLocation?'OK':'—');
+}
+
+/* ==========================
+   Orientación (heading)
+========================== */
+function calibrateNorth(){
+  if(!isFinite(state.heading)){ alert('Heading no disponible'); return; }
+  state.calibOffset = wrap360(0 - state.heading);
+  alert('Calibración aplicada: '+state.calibOffset.toFixed(1)+'°');
+}
+function computeHeadingFromEvent(e){
+  // iOS
+  if (typeof e.webkitCompassHeading==='number' && !isNaN(e.webkitCompassHeading)){
+    return wrap360(e.webkitCompassHeading);
+  }
+  // Absolute (Android Chrome si disponible)
+  if (e.absolute===true && e.alpha!=null){
+    return wrap360(360 - e.alpha);
+  }
+  // Relativo (fallback). Ajustado para que "N" coincida con el BORDO SUPERIOR estando acostado.
+  if (e.alpha!=null){
+    return wrap360(360 - e.alpha - 90);
+  }
+  return NaN;
+}
+function onDeviceOrientation(e){
+  var h = computeHeadingFromEvent(e);
+  if(isFinite(h)) state.heading = wrap360(h + state.calibOffset);
+  state.pitch = (typeof e.beta==='number')? e.beta : 0; // ~0 acostado, ~90 vertical
+  state.roll = (typeof e.gamma==='number')? e.gamma : 0;
+}
+function enableSensors(){
+  try{
+    if ('ondeviceorientationabsolute' in window){
+      window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+      state.permissionSensors=true; updatePermStatus(); return;
+    }
+    if (typeof DeviceOrientationAbsoluteEvent!=='undefined'){
+      window.addEventListener('DeviceOrientationAbsoluteEvent', onDeviceOrientation, true);
+      state.permissionSensors=true; updatePermStatus(); return;
+    }
+    if (typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+      DeviceOrientationEvent.requestPermission().then(function(res){
+        if(res!=='granted'){ alert('Permiso de orientación denegado'); return; }
+        window.addEventListener('deviceorientation', onDeviceOrientation, true);
+        state.permissionSensors=true; updatePermStatus();
+      });
+    } else {
+      window.addEventListener('deviceorientation', onDeviceOrientation, true);
+      state.permissionSensors=true; updatePermStatus();
+    }
+  }catch(err){ alert('No se pudieron habilitar sensores'); }
+}
+
+/* ==========================
+   Compass (dibujo)
+========================== */
+function drawCompassBase(ctx,w,h){
+  ctx.clearRect(0,0,w,h);
+  var cx=w/2,cy=h/2,r=Math.min(cx,cy)-16;
+  var g=ctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r);
+  g.addColorStop(0,'#101828'); g.addColorStop(1,'#0b111a');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=2; ctx.stroke();
+
+  ctx.save(); ctx.translate(cx,cy);
+  for(var d=0; d<360; d+=5){
+    var len=(d%45===0)?14:(d%10===0?10:6);
+    ctx.rotate(d2r(5));
+    ctx.beginPath();
+    ctx.moveTo(0,-r); ctx.lineTo(0,-r+len);
+    ctx.strokeStyle='rgba(255,255,255,.25)';
+    ctx.lineWidth=(d%45===0)?2:1;
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  var labels=[[0,'N'],[90,'E'],[180,'S'],[270,'O']];
+  ctx.fillStyle='white'; ctx.font='600 18px system-ui, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(var i=0;i<labels.length;i++){
+    var a=d2r(labels[i][0]);
+    var x=cx+Math.sin(a)*(r-26), y=cy-Math.cos(a)*(r-26);
+    ctx.fillText(labels[i][1],x,y);
+  }
+  return {cx:cx,cy:cy,r:r};
+}
+function drawNeedle(ctx,base,heading,target){
+  var cx=base.cx,cy=base.cy,r=base.r;
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(d2r(heading));
+  ctx.beginPath(); ctx.moveTo(0,10); ctx.lineTo(6,0); ctx.lineTo(0,-r+24); ctx.lineTo(-6,0); ctx.closePath();
+  ctx.fillStyle='rgba(79,209,197,.95)'; ctx.fill();
+  ctx.restore();
+  if(target!=null){
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(d2r(target));
+    ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(5,0); ctx.lineTo(0,-r+44); ctx.lineTo(-5,0); ctx.closePath();
+    ctx.fillStyle='rgba(112,161,255,.9)'; ctx.fill();
+    ctx.restore();
+  }
+}
+function centerReadout(ctx,base,txt,sub){
+  var cx=base.cx,cy=base.cy;
+  ctx.fillStyle='rgba(0,0,0,.35)'; ctx.beginPath(); ctx.arc(cx,cy,54,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='white'; ctx.font='700 24px system-ui,sans-serif'; ctx.textAlign='center';
+  ctx.fillText(txt,cx,cy-6);
+  ctx.fillStyle='var(--muted)'; ctx.font='500 13px system-ui,sans-serif';
+  ctx.fillText(sub,cx,cy+14);
+}
+
+/* ==========================
+   Listado Finder
+========================== */
+function renderSatList(){
+  if(!satList) return;
+  var q=(search.value||'').toLowerCase();
+  var arr=SATS.map(function(s){
+    var ae=azElToGeoSat(state.lat,state.lon,s.lon);
+    return {name:s.name,lon:s.lon,az:ae.az,el:ae.el};
+  }).sort(function(a,b){return a.lon-b.lon;})
+    .filter(function(s){return !q || s.name.toLowerCase().indexOf(q)>=0 || String(s.lon).indexOf(q)>=0;});
+
+  satList.innerHTML='';
+  for(var i=0;i<arr.length;i++){
+    var s=arr[i];
+    var row=document.createElement('div'); row.className='item';
+    var left=document.createElement('div');
+    left.innerHTML='<div><strong>'+s.name+'</strong></div><div class="muted">'+s.lon.toFixed(1)+'° '+(s.lon>0?'E':'W')+' · Az '+s.az.toFixed(1)+'° · El '+s.el.toFixed(1)+'°</div>';
+    var right=document.createElement('div');
+    var tag=document.createElement('span'); tag.className='tag'; tag.textContent=(s.el>=0?'Sobre horizonte':'Debajo');
+    tag.style.color=(s.el>=0?'var(--ok)':'var(--bad)');
+    var btn=document.createElement('button'); btn.className='btn'; btn.textContent='Apuntar';
+    (function(ss,elv,azv){
+      btn.onclick=function(){
+        state.selectedSat=ss;
+        selectedName.textContent=ss.name+' ('+(ss.lon>0?'+':'')+ss.lon.toFixed(1)+'°)';
+        $('next-2').disabled=false;
+      };
+    })({name:s.name,lon:s.lon}, s.el, s.az);
+    right.appendChild(tag); right.appendChild(document.createTextNode(' ')); right.appendChild(btn);
+    row.appendChild(left); row.appendChild(right);
+    satList.appendChild(row);
+  }
+}
+
+/* ==========================
+   AR: overlay + cámara
+========================== */
+function resizeOverlay(){
+  overlay.width = cam.clientWidth || cam.videoWidth || overlay.width;
+  overlay.height = cam.clientHeight || cam.videoHeight || overlay.height;
+}
+window.addEventListener('resize', resizeOverlay);
+
+function drawAR(trueHeading){
+  if(cam.readyState<2) return;
+  var W=overlay.width,H=overlay.height; if(!W||!H) return;
+  octx.clearRect(0,0,W,H);
+
+  var headingCam=wrap360(trueHeading + (Number(cameraAlignEl.value)||0));
+  var camPitch=(state.pitch||0)-90; // 0 ≈ vertical. Si levantás 90° desde acostado, camPitch≈0
+  var fH=Number(fovH.value)||60, fV=Number(fovV.value)||40;
+
+  var list=[];
+  if(state.lockSingle && state.selectedSat){
+    list=[state.selectedSat];
+  }else{
+    list=SATS.slice();
+  }
+
+  for(var i=0;i<list.length;i++){
+    var s=list[i];
+    var ae=azElToGeoSat(state.lat,state.lon,s.lon);
+    if(ae.el<0 && !(arShowBelow&&arShowBelow.checked)) continue;
+
+    // Diferencias relativas a lo que ve la cámara
+    var relAz=wrap180(ae.az-headingCam);
+    var relEl=ae.el-camPitch;
+
+    var x=W/2 + (relAz/(fH/2))*(W/2);
+    var y=H/2 - (relEl/(fV/2))*(H/2);
+    if(x<-60||x>W+60||y<-60||y>H+60) continue;
+
+    // Punto del satélite
+    octx.beginPath(); octx.arc(x,y,5,0,Math.PI*2);
+    octx.fillStyle=(ae.el>=0? 'rgba(79,209,197,.95)':'rgba(239,68,68,.9)'); octx.fill();
+
+    // Etiqueta
+    var label=s.name+' · '+Math.round(ae.az)+'°/'+Math.round(ae.el)+'°';
+    octx.font='600 13px system-ui,sans-serif'; octx.textBaseline='top';
+    var tw=octx.measureText(label).width+10;
+    octx.fillStyle='rgba(0,0,0,.5)'; octx.fillRect(x+8,y-2,tw,20);
+    octx.strokeStyle='rgba(255,255,255,.15)'; octx.strokeRect(x+8,y-2,tw,20);
+    octx.fillStyle='white'; octx.fillText(label,x+13,y);
+  }
+
+  // retícula central
+  octx.beginPath(); octx.arc(W/2,H/2,14,0,Math.PI*2); octx.strokeStyle='rgba(255,255,255,.85)'; octx.lineWidth=2; octx.stroke();
+  octx.beginPath(); octx.arc(W/2,H/2,2,0,Math.PI*2); octx.fillStyle='#fff'; octx.fill();
+
+  // HUD de ayuda (sólo en modo secuencial con selección)
+  if(state.lockSingle && state.selectedSat){
+    var tgt=azElToGeoSat(state.lat,state.lon,state.selectedSat.lon);
+    var elevNeeded = Math.max(0, Math.round(tgt.el));
+    octx.font='700 14px system-ui,sans-serif';
+    octx.fillStyle='rgba(0,0,0,.55)';
+    octx.fillRect(10,10,320,48);
+    octx.strokeStyle='rgba(255,255,255,.15)'; octx.strokeRect(10,10,320,48);
+    octx.fillStyle='white';
+    octx.fillText('Objetivo: '+state.selectedSat.name, 18, 18);
+    octx.fillStyle='var(--muted)';
+    octx.fillText('Levantá 90° + '+elevNeeded+'° y hacé coincidir el punto con la retícula', 18, 38);
+  }
+}
+
+/* ==========================
+   Render loop (todas las vistas)
+========================== */
+function render(){
+  state.declination = Number(declinationEl.value)||0;
+  state.headingOffset = Number(headingOffsetEl.value)||0;
+  state.cameraAlign = Number(cameraAlignEl.value)||0;
+
+  var heading = isFinite(state.heading)? state.heading : 0;
+  var trueHeading = wrap360(heading + state.declination + state.headingOffset);
+
+  // Finder: brújula dirigida
+  if(ctx && compass){
+    var base = drawCompassBase(ctx, compass.width, compass.height);
+    var targetAz=null, elev=null;
+    if(state.selectedSat){
+      var res=azElToGeoSat(state.lat,state.lon,state.selectedSat.lon);
+      targetAz=res.az; elev=res.el;
+    }
+    drawNeedle(ctx, base, trueHeading, targetAz);
+    centerReadout(ctx, base, Math.round(trueHeading)+'°', targetAz!=null?('Az objetivo '+Math.round(targetAz)+'°'):'Heading verdadero');
+
+    if(headingVal) headingVal.textContent = trueHeading.toFixed(1)+'°';
+    if(azVal) azVal.textContent = (targetAz!=null? targetAz.toFixed(1)+'°' : '—');
+    if(elVal) elVal.textContent = (elev!=null? elev.toFixed(1)+'°' : '—');
+    if(statusVal && elev!=null){
+      statusVal.textContent = (elev>=0?'Visible':'Bajo horizonte');
+      statusVal.style.color=(elev>=0?'var(--ok)':'var(--bad)');
+      statusVal.style.opacity = (elev>=0 || (showBelow&&showBelow.checked))?1:.6;
+    }
+  }
+
+  // Compass simple (oculta)
+  if(ctxS && compassSimple){
+    var baseS=drawCompassBase(ctxS, compassSimple.width, compassSimple.height);
+    drawNeedle(ctxS, baseS, trueHeading, null);
+    centerReadout(ctxS, baseS, Math.round(trueHeading)+'°','Heading verdadero');
+  }
+
+  // AR
+  resizeOverlay(); drawAR(trueHeading);
+
+  requestAnimationFrame(render);
+}
+
+/* ==========================
+   UI: navegación secuencial
+========================== */
+function goStep(n){
+  markStep(n);
+  if(n===2){ renderSatList(); }
+  if(n===3){
+    // bloquear lista en AR y mostrar sólo el elegido
+    state.lockSingle = true;
+    if(state.selectedSat){
+      var tgt=azElToGeoSat(state.lat,state.lon,state.selectedSat.lon);
+      arHeaderInfo.textContent = state.selectedSat.name+' · Az '+Math.round(tgt.az)+'° · El '+Math.round(tgt.el)+'°';
+    } else {
+      arHeaderInfo.textContent = 'Sin selección';
+    }
+  } else {
+    state.lockSingle = false;
+  }
+}
+$('next-1').onclick=function(){ goStep(2); };
+$('prev-2').onclick=function(){ goStep(1); };
+$('next-2').onclick=function(){ goStep(3); };
+$('prev-3').onclick=function(){ goStep(2); };
+$('restart').onclick=function(){
+  state.selectedSat=null;
+  selectedName.textContent='Ninguno';
+  $('next-2').disabled=true;
+  goStep(1);
+};
+
+/* ==========================
+   Botones principales y eventos
+========================== */
+btnSensors.onclick=enableSensors;
+btnCalibrate.onclick=calibrateNorth;
+btnLocation.onclick=enableLocation;
+applyLL.onclick=function(){
+  var la=Number(latInput.value), lo=Number(lonInput.value);
+  if(isFinite(la)&&isFinite(lo)) setLocation(la,lo,'Manual');
+};
+
+// Finder
+$('btnAddSat').onclick=addSatellite;
+if($('search')) $('search').addEventListener('input', renderSatList);
+
+// Cámara
+$('startCam').onclick=function(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('Cámara no disponible o requiere HTTPS');
+    return;
+  }
+  try{ cam.setAttribute('playsinline',''); cam.setAttribute('autoplay',''); cam.muted = true; }catch(_){}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}})
+    .then(function(stream){ cam.srcObject = stream; return cam.play(); })
+    .then(function(){
+      if (cam.readyState < 2){
+        var once=function(){ cam.removeEventListener('loadedmetadata', once); resizeOverlay(); };
+        cam.addEventListener('loadedmetadata', once);
+      } else { resizeOverlay(); }
+    })
+    .catch(function(err){ alert('No se pudo iniciar cámara: '+err.message+' (¿HTTPS habilitado?)'); });
+};
+
+/* ==========================
+   Inicio
+========================== */
+try{
+  var slat=parseFloat(localStorage.getItem('sat_lat')),
+      slon=parseFloat(localStorage.getItem('sat_lon'));
+  if(isFinite(slat)&&isFinite(slon)) setLocation(slat,slon,'Restaurada');
+}catch(_){}
+if (navigator.permissions && navigator.permissions.query){
+  try{ navigator.permissions.query({name:'geolocation'}).then(function(p){ if(p.state==='granted') startGeo(); }); }catch(_){}
+}
+updatePermStatus();
+renderSatList();
+markStep(1);
+requestAnimationFrame(render);
+
+})();
+</script>
+</body>
+</html>

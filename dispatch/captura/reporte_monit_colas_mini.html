@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Edwar Pons">
+    <meta name="copyright" content="AsterVoIP (1998 - 2025)">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="robots" content="noindex,nofollow">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Last-Modified" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache,mustrevalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>PBX - Admin - Reporte MonitColasMini</title>
+</head>
+<body style="font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-size: 0.8em; background-color: #efefef; margin: 0; padding: 0; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+    <section id="idCuerpo" style="position: relative; top: 6px; left: 0; width: 100%; min-height: 100%; padding: 0;">
+        <div id="MonColF" style="font-family: Tahoma, Arial, sans-serif; font-size: 10px; min-height: 100vh; background-color: #fff;">
+            <div class="wrapper" style="max-width: 1050px; margin: 0 auto;">
+                <div id="oneDiv" style="float: left; flex: 1; margin-right: 5px;">
+                    <div id="co">
+                        <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border: 1px solid #7f8c8d; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <td colspan="11" style="text-align: left; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Llamados en Cola</td>
+                                </tr>
+                                <tr>
+                                    <th rowspan="2" style="text-align: left; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d; width: 20%;">Cola</th>
+                                    <th colspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Atendidas</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">No Atendidas</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Total</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Nivel %</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Espera Máxima</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Espera Promedio</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">EN ESPERA</th>
+                                    <th rowspan="2" style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d;">Espera Actual</th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d; width: 10%;">En Curso</th>
+                                    <th style="text-align: center; background-color: #fff; font-size: 10px; padding: 10px 0 10px 5px; border-bottom: 1px solid #7f8c8d; width: 10%;">Finalizadas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="co_tb">                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">NLegal</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">InsatVentas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">3</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">1</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">4</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">75.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:12</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:10</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">queueMORA</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">Ventas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">ColaFIBRA</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">ColaINTERNETSAT</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">C2CVentas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">3</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">3</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">100.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:41</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:25</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">WSPVentas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">queuePREVENTA</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">PreVentas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">PosventaAR</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">OrbithVentasAR</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">AtCteInsatArAdmin</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">1</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">1</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:02:32</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:02:32</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">ValleNETventas</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                                <tr>
+                                    <td style="text-align: left; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">Test</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0.00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">0</td>
+                                    <td style="text-align: center; padding: 2px 0 2px 5px; font-size: 15px; border-bottom: 1px solid #7f8c8d;">00:00:00</td>
+                                </tr>                            </tbody>
+                        </table>
+                    </div>
+                    <div id="ane" style="margin-top: 10px;">
+                        <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border: 1px solid #7f8c8d; border-collapse: collapse;">
+                            <tbody>
+                                <tr>
+                                    <td style="background-color: #fff; padding: 10px 0 10px 5px; text-align: center; width: 25%;"><h3 style="margin: 0; font-size: 13px; font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-weight: bold;">Atendidos</h3></td>
+                                    <td style="background-color: #fff; padding: 10px 0 10px 5px; text-align: center; width: 25%;"><h3 style="margin: 0; font-size: 13px; font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-weight: bold;">Nivel</h3></td>
+                                    <td style="background-color: #fff; padding: 10px 0 10px 5px; text-align: center; width: 50%;"><h3 style="margin: 0; font-size: 13px; font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-weight: bold;">Mayor Espera</h3></td>
+                                </tr>
+                                <tr>
+                                    <td id="ll_at" style="vertical-align: middle; padding: 10px 0 10px 5px; font-size: 25px; text-align: center; font-weight: bold; color: rgba(71, 191, 63, 1); border-bottom: 1px solid #7f8c8d;">6</td>
+                                    <td id="prom_at" style="vertical-align: middle; padding: 10px 0 10px 5px; font-size: 25px; text-align: center; font-weight: bold; color: #000; border-bottom: 1px solid #7f8c8d;">75.00</td>
+                                    <td id="mte" style="vertical-align: middle; padding: 10px 0 10px 5px; font-size: 25px; text-align: center; font-weight: bold; color: #000; border-bottom: 1px solid #7f8c8d;">00:02:32 (AtCteInsatArAdmin)</td>
+                                </tr>
+                                <tr>
+                                    <td style="background-color: #fff; padding: 10px 0 10px 5px; text-align: center;"><h3 style="margin: 0; font-size: 12px; font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-weight: bold;">No Atendidos</h3></td>
+                                    <td style="background-color: #fff; padding: 10px 0 10px 5px;" colspan="2"><h3 style="margin: 0; font-size: 12px; font-family: 'RobotoRegular', Tahoma, Arial, sans-serif; font-weight: bold;">Últimas 3 No Atendidos</h3></td>
+                                </tr>
+                                <tr>
+                                    <td id="ll_nat" style="vertical-align: middle; padding: 15px 0 15px 5px; font-size: 25px; text-align: center; font-weight: bold; color: rgba(191, 63, 71, 1); border-bottom: 1px solid #7f8c8d;">2</td>
+                                    <td id="dt_nat" style="vertical-align: middle; padding: 15px 5px 15px 0; font-size: 14px; text-align: right;font-weight: bold; color: rgba(191, 63, 71, 1); border-bottom: 1px solid #7f8c8d;" colspan="2">10:39:28 [ 1161532605 ] ( AtCteInsatArAdmin )<br>10:09:43 [ 1161532605 ] ( InsatVentas )</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

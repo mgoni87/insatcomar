@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heading de la Cámara</title>
+<style>
+  :root{
+    --bg:#0b0f14;--ink:#e8f0fb;--brand:#60a5fa;--line:rgba(255,255,255,.12);
+    --bad:#ef4444;
+  }
+  html,body{
+    height:100%; margin:0;
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+  }
+  .wrap{ max-width:400px; padding:20px; border-radius:16px; border:1px solid var(--line); background:#101722; }
+  h1{ font-size:24px; margin-bottom:10px; }
+  #heading-value{ font-size:96px; font-weight:700; color:var(--brand); line-height:1; }
+  .note{ margin-top:20px; font-size:14px; color:#93a6bb; }
+  .error{ color:var(--bad); font-weight:600; }
+  .btn{ display:inline-flex; border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--ink); padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600; margin-top:15px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Dirección de Apuntamiento</h1>
+  <div id="heading-value">—°</div>
+  <button id="ask-perms" class="btn">Solicitar Permisos (iOS)</button>
+  <div id="status" class="note">Presioná el botón (si usás iOS) o mové el teléfono.</div>
+</div>
+
+<script>
+(function(){ 'use strict';
+/* ========= Utiles ========= */
+const d2r=d=>d*Math.PI/180, r2d=r=>r*180/Math.PI;
+const wrap360=d=>{d=d%360; if(d<0)d+=360; return d;};
+const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+const $ = id => document.getElementById(id);
+
+function getScreenAngle(){
+  // Obtiene la rotación de la pantalla (ej: 0, 90, 180, 270)
+  if (screen.orientation && typeof screen.orientation.angle === 'number') {
+    return screen.orientation.angle || 0;
+  }
+  if (typeof window.orientation === 'number') {
+    let ang = window.orientation || 0;
+    if (ang < 0) ang += 360; // normalizar -90 a 270
+    return ang;
+  }
+  return 0;
+}
+
+/* ========= Estado ========= */
+const state={
+  heading:NaN,
+  hx:null, hy:null, smooth:0.15, // Coordenadas para el suavizado
+  initialized: false,
+  hasBranding: false
+};
+
+/* ========= Referencias UI ========= */
+const headingValue = $('heading-value');
+const statusDiv    = $('status');
+const askPermsBtn  = $('ask-perms');
+
+/* ========= Lógica del Sensor ========= */
+
+function computeHeadingFromEvent(e){
+  // En iOS, el ángulo alpha es a menudo absoluto. Usamos 360 - alpha + corrección de pantalla.
+  if (IS_IOS) {
+    if (e && e.alpha != null) {
+      let h = 360 - e.alpha;
+      let ang = getScreenAngle();
+      h = h + ang;
+      return wrap360(h);
+    }
+    return NaN;
+  }
+
+  // No-iOS: Usar webkitCompassHeading o alpha absoluto si están disponibles.
+  if (typeof e.webkitCompassHeading==='number' && !isNaN(e.webkitCompassHeading)){
+    return wrap360(e.webkitCompassHeading);
+  }
+  if (e.absolute===true && e.alpha!=null){
+    return wrap360(360 - e.alpha);
+  }
+  // Fallback si no hay brújula absoluta
+  return NaN;
+}
+
+function onDeviceOrientation(e){
+  if (!state.initialized) {
+    state.initialized = true;
+    statusDiv.textContent = 'Recibiendo datos... Apuntá el teléfono.';
+    statusDiv.classList.remove('error');
+  }
+
+  console.log('Sensor Crudo (Alpha/Heading, Beta/Pitch, Gamma/Roll):', e.alpha, e.beta, e.gamma);
+
+  const h = computeHeadingFromEvent(e);
+  if (isFinite(h)){
+    state.heading = h;
+    state.hasBranding = true; // Tenemos datos válidos
+    
+    // Suavizado (Low-Pass Filter)
+    const x=Math.cos(d2r(state.heading)), y=Math.sin(d2r(state.heading));
+    if (state.hx==null){ state.hx=x; state.hy=y; }
+    else{
+      const a=state.smooth;
+      state.hx=(1-a)*state.hx + a*x;
+      state.hy=(1-a)*state.hy + a*y;
+    }
+  }
+}
+
+function smoothedHeadingDeg(){
+  // Si no se han acumulado datos, devuelve el heading crudo (o 0 si no hay)
+  if(state.hx==null || state.hy==null) return (isFinite(state.heading)?state.heading:0);
+  // Calcula el ángulo a partir del vector suavizado
+  return wrap360(r2d(Math.atan2(state.hy,state.hx)));
+}
+
+function updateDisplay(){
+  const head = smoothedHeadingDeg();
+  console.log('Heading Suavizado:', Math.round(head));
+  
+  
+  if (isFinite(head) && state.hasBranding) {
+    // Si tenemos datos válidos, mostramos el heading suavizado.
+    headingValue.textContent = Math.round(head) + '°';
+  } else if(state.initialized) {
+    // Si ya inicializamos pero no tenemos datos de brújula válidos (falló el sensor)
+    headingValue.textContent = '—°';
+    statusDiv.innerHTML = '<span class="error">⚠️ Brújula no disponible o no absoluta.</span> Asegurate de estar al aire libre.';
+  } else {
+    // Estado inicial
+    headingValue.textContent = '—°';
+  }
+
+  requestAnimationFrame(updateDisplay);
+}
+
+/* ========= Permisos e Inicialización ========= */
+
+function startOrientationListener() {
+  const handler = window.DeviceOrientationEvent && window.DeviceOrientationEvent.requestPermission;
+
+  if (IS_IOS && handler && typeof handler === 'function') {
+    // Es iOS 13+ y necesita solicitar permisos explícitamente
+    askPermsBtn.style.display = 'block';
+    askPermsBtn.onclick = () => {
+      handler().then(res => {
+        if (res === 'granted') {
+          // Si se conceden, usamos el listener normal (que en iOS contiene los datos absolutos)
+          window.addEventListener('deviceorientation', onDeviceOrientation, true);
+          askPermsBtn.style.display = 'none';
+          statusDiv.textContent = 'Permisos concedidos. Apuntá el teléfono.';
+        } else {
+          statusDiv.innerHTML = '<span class="error">Permisos denegados.</span> Reintentá.';
+          askPermsBtn.textContent = 'Reintentar Permisos';
+        }
+      }).catch(err => {
+        statusDiv.innerHTML = '<span class="error">Error al solicitar permisos.</span>';
+      });
+    };
+  } else {
+    // Otros dispositivos: priorizamos 'absolute' si existe, sino usamos 'deviceorientation'
+    askPermsBtn.style.display = 'none';
+    
+    if ('ondeviceorientationabsolute' in window) {
+      window.addEventListener('deviceorientationabsolute', onDeviceOrientation, true);
+      statusDiv.textContent = 'Escuchando sensor absoluto. Apuntá el teléfono.';
+    } else {
+      window.addEventListener('deviceorientation', onDeviceOrientation, true);
+      statusDiv.textContent = 'Escuchando sensor estándar. Apuntá el teléfono.';
+    }
+  }
+
+  // Comienza el ciclo de actualización de la pantalla
+  requestAnimationFrame(updateDisplay);
+}
+
+startOrientationListener();
+
+})();
+</script>
+</body>
+</html>
