@@ -54,7 +54,7 @@ if (empty($domicilio)) {
 // Validar y sanitizar $domicilio
 $domicilio = htmlspecialchars($domicilio, ENT_QUOTES, 'UTF-8');
 
-$link = "https://www.tucable.com.ar/redirect-wsp-asesor.php";
+$link = "https://encuentrainternet.com.ar/redirects/redirect-wsp-asesor.php?mssg=Hola%20EncuentraInternet,%20a%20continuaci%C3%B3n%20enviar%C3%A9%20mi%20ubicaci%C3%B3n%20para%20conocer%20servicios%20de%20Internet%20y%20Cable%20en%20mi%20zona";
 $localidad_trimmed = explode(',', $localidad)[0];
 ?>
 <!DOCTYPE HTML>

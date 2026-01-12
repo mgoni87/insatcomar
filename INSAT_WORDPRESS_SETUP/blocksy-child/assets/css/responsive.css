@@ -1,0 +1,270 @@
+/* ==================== TABLET (481-768px) ==================== */
+@media (max-width: 768px) {
+  :root {
+    --size-h1: 2.5rem;
+    --size-h2: 2rem;
+    --size-h3: 1.5rem;
+    --size-h4: 1.25rem;
+    --space-3xl: 2.5rem;
+    --space-4xl: 3.5rem;
+  }
+
+  .hero {
+    min-height: 70vh;
+  }
+
+  .hero-content {
+    padding: var(--space-2xl);
+  }
+
+  .section {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  .container {
+    padding: 0 var(--space-lg);
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevenir zoom en iOS */
+  }
+}
+
+/* ==================== MOBILE (0-480px) ==================== */
+@media (max-width: 480px) {
+  :root {
+    --size-h1: 1.75rem;
+    --size-h2: 1.5rem;
+    --size-h3: 1.25rem;
+    --size-h4: 1rem;
+    --size-body: 0.95rem;
+    --space-2xl: 1.5rem;
+    --space-3xl: 2rem;
+    --space-4xl: 2.5rem;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  .hero {
+    min-height: 60vh;
+  }
+
+  .hero-content {
+    padding: var(--space-lg);
+  }
+
+  .hero h1 {
+    margin-bottom: var(--space-md);
+  }
+
+  .hero p {
+    font-size: 1rem;
+    margin-bottom: var(--space-lg);
+  }
+
+  .section {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .section-tight {
+    padding: var(--space-lg);
+  }
+
+  .container {
+    padding: 0 var(--space-md);
+  }
+
+  .card {
+    padding: var(--space-lg);
+  }
+
+  .step-card {
+    padding: var(--space-lg);
+  }
+
+  .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .breadcrumb {
+    font-size: var(--size-xs);
+  }
+
+  .btn,
+  button {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--size-small);
+  }
+
+  .btn-large {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--size-body);
+  }
+
+  .btn-full {
+    width: 100%;
+  }
+
+  table {
+    font-size: var(--size-small);
+  }
+
+  th,
+  td {
+    padding: var(--space-md);
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+  }
+}
+
+/* ==================== LANDSCAPE MODE ==================== */
+@media (max-height: 600px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: var(--space-2xl) 0;
+  }
+}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==================== LIGHT MODE PREFERENCE ==================== */
+@media (prefers-color-scheme: light) {
+  html, body {
+    background-color: #F5F5F5;
+    color: #050505;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #050505;
+  }
+
+  .card {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .card:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  input,
+  textarea,
+  select {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #050505;
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(5, 5, 5, 0.5);
+  }
+}
+
+/* ==================== HIGH CONTRAST ==================== */
+@media (prefers-contrast: more) {
+  :root {
+    --color-border: rgba(255, 255, 255, 0.3);
+  }
+
+  .btn:hover {
+    box-shadow: 0 0 0 3px var(--color-accent);
+  }
+}
+
+/* ==================== DARK MODE PREFERENCE ==================== */
+@media (prefers-color-scheme: dark) {
+  html, body {
+    background-color: var(--color-dark);
+    color: var(--color-light);
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  html, body {
+    background-color: white;
+    color: black;
+  }
+
+  .btn,
+  button,
+  .nav,
+  .navigation {
+    display: none;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+/* ==================== TOUCH DEVICES ==================== */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .btn,
+  a {
+    padding: var(--space-lg) var(--space-xl);
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

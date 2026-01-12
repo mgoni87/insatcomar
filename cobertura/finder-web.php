@@ -1,5 +1,5 @@
 <?php
 // Redirección a la URL especificada
-header("Location: https://encuentrainternet.com.ar/step1-add-phone.php");
+header("Location: https://mi.encuentrainternet.com.ar/login.php");
 exit();
 ?>

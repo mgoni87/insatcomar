@@ -1,0 +1,15 @@
+/*
+Theme Name: Blocksy Child - INSAT
+Theme URI: https://insat.com.ar
+Description: WordPress theme con estética tech/minimalista para INSAT (Starlink-inspired style)
+Version: 1.0.0
+Author: INSAT Digital
+Author URI: https://insat.com.ar
+Template: blocksy
+Text Domain: insat-child
+Domain Path: /languages
+*/
+
+@import url("./assets/css/variables.css");
+@import url("./assets/css/components.css");
+@import url("./assets/css/responsive.css");

@@ -1,0 +1,36 @@
+# STAGING: HTTP BASIC AUTH + SEO SAFETY
+# Coloca esto en el archivo .htaccess de cobertura.insat.com.ar
+
+<Files ~ "^\.ht">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# HTTP BASIC AUTH para TODO el staging
+<Directory /home/insatcomar/public_html/cobertura>
+    AuthType Basic
+    AuthName "Staging INSAT - Acceso Restringido"
+    AuthUserFile /home/insatcomar/.htpasswd
+    Require valid-user
+</Directory>
+
+# Permitir acceso sin autenticación a archivos estáticos (opcional, para performance)
+<FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf)$">
+    Satisfy any
+    Allow from all
+</FilesMatch>
+
+# X-Robots-Tag header
+<IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+</IfModule>
+
+# Deshabilitar indexación
+<IfModule mod_setenvif.c>
+    SetEnvIf Request_URI ".*" isStaging=1
+</IfModule>
+
+# Bloquear sitemaps
+RewriteEngine On
+RewriteRule ^wp-sitemap.*$ - [F,L]
+RewriteRule ^sitemap.*$ - [F,L]

@@ -49,12 +49,12 @@ a:active {
               </div>
 				
 			<div>
-			  <button type="button" onclick="window.location.href = 'https://www.encuentrainternet.com.ar/redirect-wsp-asesor.html';">WHATSAPP</button>
+			  <button type="button" onclick="window.location.href = 'https://encuentrainternet.com.ar/redirects/redirect-wsp-asesor.php?mssg=Hola%20EncuentraInternet,%20a%20continuaci%C3%B3n%20enviar%C3%A9%20mi%20ubicaci%C3%B3n%20para%20conocer%20servicios%20de%20Internet%20y%20Cable%20en%20mi%20zona';">WHATSAPP</button>
 
 			</div>
 			<br><br>
 			<div>
-			  <button type="button" onclick="window.location.href = 'https://encuentrainternet.com.ar/v2';" style="color: white;">WEB</button>
+			  <button type="button" onclick="window.location.href = 'https://mi.encuentrainternet.com.ar/login.php';" style="color: white;">WEB</button>
 			</div>
 			<br><br>
 			<div align="center">
